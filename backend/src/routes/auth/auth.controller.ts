@@ -14,10 +14,23 @@ import { AuthService } from './auth.service';
 import type { AuthenticatedRequest } from './auth.types';
 import { LoginRateLimitGuard } from './login-rate-limit.guard';
 
+type CookieSameSite = 'lax' | 'strict' | 'none';
+
+const cookieSecure = process.env.COOKIE_SECURE === 'true';
+const configuredSameSite = process.env.COOKIE_SAME_SITE?.trim().toLowerCase();
+const sameSite: CookieSameSite =
+    configuredSameSite === 'lax' || configuredSameSite === 'strict'
+        ? configuredSameSite
+        : configuredSameSite === 'none' && cookieSecure
+          ? 'none'
+          : cookieSecure
+            ? 'none'
+            : 'lax';
+
 const sessionCookieOptions = {
     httpOnly: true,
-    sameSite: 'lax' as const,
-    secure: process.env.COOKIE_SECURE === 'true',
+    sameSite,
+    secure: cookieSecure,
     path: '/',
 };
 

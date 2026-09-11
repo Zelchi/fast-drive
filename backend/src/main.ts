@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { Logger } from '@nestjs/common';
+import type { CustomOrigin } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { NestFactory } from '@nestjs/core';
 import { config as loadEnv } from 'dotenv';
 import type { NextFunction, Request, Response } from 'express';
@@ -16,9 +17,28 @@ async function bootstrap() {
     app.use(express.urlencoded({ extended: true, limit: '512kb' }));
     const globalPrefix = 'api';
     app.setGlobalPrefix(globalPrefix);
-    const corsOrigin = process.env.CORS_ORIGIN?.trim();
-    if (corsOrigin) {
-        app.enableCors({ origin: corsOrigin, credentials: true });
+    const configuredCorsOrigins = (process.env.CORS_ORIGIN ?? '')
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean);
+    const allowedCorsOrigins = new Set([
+        ...configuredCorsOrigins,
+        'http://tauri.localhost',
+        'https://tauri.localhost',
+        'tauri://localhost',
+    ]);
+    if (allowedCorsOrigins.size > 0) {
+        const corsOrigin: CustomOrigin = (origin, callback) => {
+            if (!origin || allowedCorsOrigins.has(origin)) {
+                callback(null, true);
+                return;
+            }
+            callback(null, false);
+        };
+        app.enableCors({
+            origin: corsOrigin,
+            credentials: true,
+        });
     }
     const webRoot = resolve(
         process.env.WEB_DIST_ROOT?.trim() ||

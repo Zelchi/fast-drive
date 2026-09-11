@@ -1,5 +1,5 @@
 import { HttpClient, type HttpEvent } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
     createFolderInputSchema,
     type FileListing,
@@ -35,6 +35,7 @@ import {
 } from '@fast-drive/shared-types';
 import type { Observable } from 'rxjs';
 import { parseRequest, validateHttpEvent, validateResponse } from './api-validation';
+import { ServerConfigService } from './server-config.service';
 
 export type {
     DriveFile,
@@ -47,6 +48,8 @@ export type { StorageOverview, Workspace, WorkspaceMember } from '@fast-drive/sh
 
 @Injectable({ providedIn: 'root' })
 export class DriveApiService {
+    private readonly serverConfig = inject(ServerConfigService);
+
     constructor(private readonly http: HttpClient) {}
 
     listWorkspaces(): Observable<WorkspacesResponse> {
@@ -232,14 +235,14 @@ export class DriveApiService {
     }
 
     publicShareContentUrl(token: string): string {
-        return `/api/shares/${encodeURIComponent(token)}/content`;
+        return this.serverConfig.apiUrl(`/api/shares/${encodeURIComponent(token)}/content`);
     }
 
     publicShareDownloadUrl(token: string): string {
-        return `/api/shares/${encodeURIComponent(token)}`;
+        return this.serverConfig.apiUrl(`/api/shares/${encodeURIComponent(token)}`);
     }
 
     downloadUrl(fileId: string): string {
-        return `/api/files/${fileId}/download`;
+        return this.serverConfig.apiUrl(`/api/files/${fileId}/download`);
     }
 }

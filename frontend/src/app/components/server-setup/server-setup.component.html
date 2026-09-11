@@ -1,0 +1,38 @@
+<main class="server-setup-layout">
+  <section class="server-setup-card">
+    <div class="server-setup-brand" aria-hidden="true">FD</div>
+    <p class="server-setup-eyebrow">PRIMEIRA CONFIGURAÇÃO</p>
+    <h1>Conecte o Fast Drive</h1>
+    <p class="server-setup-copy">
+      Informe o endereço da instalação do Fast Drive para começar a usar o aplicativo.
+    </p>
+
+    <form (ngSubmit)="connect()">
+      <label>
+        Endereço da aplicação
+        <input
+          name="serverUrl"
+          [(ngModel)]="serverUrl"
+          type="url"
+          autocomplete="url"
+          placeholder="https://drive.exemplo.com"
+          spellcheck="false"
+          (blur)="normalizeAddress()"
+          required
+        >
+      </label>
+
+      <p class="server-setup-help">
+        Você pode informar apenas drive.exemplo.com; o HTTPS será adicionado automaticamente.
+      </p>
+
+      @if (error) {
+      <p class="server-setup-error" role="alert">{{ error }}</p>
+      }
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Testando conexão...' : 'Conectar' }}
+      </button>
+    </form>
+  </section>
+</main>

@@ -114,4 +114,8 @@ export class AuthService {
             .pipe(validateResponse(logoutResponseSchema))
             .pipe(tap(() => this.currentUser.set(null)));
     }
+
+    clearCurrentUser(): void {
+        this.currentUser.set(null);
+    }
 }

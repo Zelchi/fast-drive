@@ -5,10 +5,14 @@
   (scroll)="syncAppScrollbar()"
   (wheel)="onAppWheel($event)"
 >
+  @if (serverConfig.requiresSetup()) {
+  <app-server-setup />
+  } @else {
   <router-outlet
     (activate)="scheduleAppScrollbarSync()"
     (deactivate)="scheduleAppScrollbarSync()"
   ></router-outlet>
+  }
 </div>
 @if (appScrollbarVisible) {
 <div

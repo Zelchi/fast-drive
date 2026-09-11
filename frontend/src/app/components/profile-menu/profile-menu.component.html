@@ -138,6 +138,11 @@
       </button>
     </form>
 
+    @if (serverConfig.isDesktop) {
+    <button class="profile-server-config" type="button" (click)="changeServer()">
+      Configurar servidor
+    </button>
+    }
     <button class="profile-logout" type="button" (click)="logout()">Sair da conta</button>
   </section>
   }

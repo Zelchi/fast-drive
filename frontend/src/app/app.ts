@@ -3,16 +3,19 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
+    effect,
     HostListener,
     inject,
     OnDestroy,
     ViewChild,
 } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { AppModalComponent } from './components/app-model/app-modal.component';
+import { ServerSetupComponent } from './components/server-setup/server-setup.component';
+import { ServerConfigService } from './core/server-config.service';
 
 @Component({
-    imports: [AppModalComponent, RouterOutlet],
+    imports: [AppModalComponent, RouterOutlet, ServerSetupComponent],
     selector: 'app-root',
     templateUrl: './app.html',
     styleUrl: './app.css',
@@ -21,13 +24,23 @@ export class App implements AfterViewInit, OnDestroy {
     @ViewChild('appScrollViewport') private appScrollViewport?: ElementRef<HTMLElement>;
 
     private readonly changeDetectorRef = inject(ChangeDetectorRef);
+    private readonly router = inject(Router);
+    readonly serverConfig = inject(ServerConfigService);
     private mutationObserver?: MutationObserver;
     private scrollbarFrame: number | null = null;
     private removeScrollbarDragListeners: (() => void) | null = null;
+    private routerInitialized = false;
 
     appScrollbarVisible = false;
     appScrollbarThumbHeight = 0;
     appScrollbarThumbOffset = 0;
+
+    constructor() {
+        effect(() => {
+            this.serverConfig.requiresSetup();
+            this.startRouterIfReady();
+        });
+    }
 
     ngAfterViewInit(): void {
         const viewport = this.appScrollViewport?.nativeElement;
@@ -40,6 +53,7 @@ export class App implements AfterViewInit, OnDestroy {
             });
         }
         this.scheduleAppScrollbarSync();
+        this.startRouterIfReady();
     }
 
     ngOnDestroy(): void {
@@ -48,6 +62,19 @@ export class App implements AfterViewInit, OnDestroy {
             cancelAnimationFrame(this.scrollbarFrame);
         }
         this.removeScrollbarDragListeners?.();
+    }
+
+    private startRouterIfReady(): void {
+        if (
+            this.routerInitialized ||
+            this.serverConfig.requiresSetup() ||
+            !this.appScrollViewport
+        ) {
+            return;
+        }
+
+        this.routerInitialized = true;
+        queueMicrotask(() => this.router.initialNavigation());
     }
 
     @HostListener('document:contextmenu', ['$event'])

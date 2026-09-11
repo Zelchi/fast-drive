@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
 import { ModalService } from '../../core/modal.service';
+import { ServerConfigService } from '../../core/server-config.service';
 
 const maxAvatarSourceSize = 8 * 1024 * 1024;
 const maxAvatarDataUrlLength = 400_000;
@@ -23,6 +24,7 @@ export class ProfileMenuComponent {
     private readonly modal = inject(ModalService);
     private readonly router = inject(Router);
     private readonly changeDetectorRef = inject(ChangeDetectorRef);
+    readonly serverConfig = inject(ServerConfigService);
 
     menuOpen = false;
     displayName = '';
@@ -174,6 +176,22 @@ export class ProfileMenuComponent {
         } finally {
             await this.router.navigateByUrl('/login');
         }
+    }
+
+    async changeServer(): Promise<void> {
+        if (
+            !(await this.modal.confirm(
+                'Você será desconectado deste servidor para configurar outro endereço.',
+                'Trocar servidor',
+            ))
+        ) {
+            return;
+        }
+
+        this.menuOpen = false;
+        this.authService.clearCurrentUser();
+        this.serverConfig.clear();
+        await this.router.navigateByUrl('/login');
     }
 
     private resetForm(): void {
