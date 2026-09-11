@@ -15,7 +15,6 @@
     </span>
     <span class="profile-trigger-copy">
       <strong>{{ profileName }}</strong>
-      <small>@{{ currentUser?.nick }}</small>
     </span>
     <svg class="profile-chevron" viewBox="0 0 24 24" aria-hidden="true">
       <path d="m7 10 5 5 5-5"></path>
@@ -58,8 +57,6 @@
       </label>
       <div class="profile-summary-copy">
         <strong>{{ profileName }}</strong>
-        <small>@{{ currentUser?.nick }}</small>
-        <span>Imagem quadrada de até 8 MB</span>
       </div>
       @if (currentUser?.avatarUrl) {
       <button
@@ -86,10 +83,6 @@
           required
         >
       </label>
-      <p class="profile-help">
-        Seu nick de acesso é <strong>@{{ currentUser?.nick }}</strong> e não será alterado.
-      </p>
-
       <div class="profile-section-label">ALTERAR SENHA</div>
       <label>
         Senha atual

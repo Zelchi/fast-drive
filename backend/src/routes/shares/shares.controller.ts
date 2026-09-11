@@ -114,6 +114,23 @@ export class SharesController {
         @Req() request: Request,
         @Res({ passthrough: true }) response: Response,
     ): Promise<StreamableFile> {
+        return this.streamPublicFile(token, request, response);
+    }
+
+    @Get('share/:token/view')
+    async view(
+        @Param('token') token: string,
+        @Req() request: Request,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<StreamableFile> {
+        return this.streamPublicFile(token, request, response);
+    }
+
+    private async streamPublicFile(
+        token: string,
+        request: Request,
+        response: Response,
+    ): Promise<StreamableFile> {
         const file = await this.sharesService.getPublicFile(token);
         const range = parseByteRange(
             typeof request.headers.range === 'string' ? request.headers.range : undefined,

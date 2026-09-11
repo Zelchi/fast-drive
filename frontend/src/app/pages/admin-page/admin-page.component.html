@@ -12,7 +12,6 @@
       <div>
         <p class="eyebrow">ADMINISTRAÇÃO</p>
         <h1>Usuários</h1>
-        <p class="intro">Crie acessos e controle os seriais da instalação.</p>
       </div>
     </div>
 
@@ -24,9 +23,6 @@
     <section class="serial-card">
       <div>
         <p class="eyebrow">SERIAL GERADO</p>
-        <p class="serial-help">
-          Copie e entregue este serial ao usuário. Ele não será exibido novamente.
-        </p>
       </div>
       <code>{{ revealedSerial }}</code>
       <button class="ghost-button" type="button" (click)="copySerial()">Copiar</button>
@@ -74,15 +70,11 @@
         <div class="user-row" *ngFor="let user of users">
           <div class="user-name">
             <strong>{{ user.nick }}</strong>
-            <small
-              >{{ user.id === authService.user()?.id ? 'Você' : 'Acesso compartilhado' }}</small
-            >
           </div>
           <div class="status-cell">
             <span class="status" [class.inactive]="!user.isActive"
               >{{ user.isActive ? 'Ativo' : 'Inativo' }}</span
             >
-            <small>{{ serialStatus(user) }}</small>
           </div>
           <span class="updated-at">{{ formatDate(user.updatedAt) }}</span>
           <div class="row-actions">

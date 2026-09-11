@@ -44,13 +44,6 @@ h1 {
   letter-spacing: -0.06em;
 }
 
-.server-setup-copy {
-  margin: 0.85rem 0 1.75rem;
-  color: #999;
-  font-size: 0.86rem;
-  line-height: 1.55;
-}
-
 form {
   display: grid;
   gap: 0.75rem;

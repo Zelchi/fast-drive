@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { Logger } from '@nestjs/common';
+import { Logger, RequestMethod } from '@nestjs/common';
 import type { CustomOrigin } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { NestFactory } from '@nestjs/core';
 import { config as loadEnv } from 'dotenv';
@@ -16,7 +16,9 @@ async function bootstrap() {
     app.use(express.json({ limit: '512kb' }));
     app.use(express.urlencoded({ extended: true, limit: '512kb' }));
     const globalPrefix = 'api';
-    app.setGlobalPrefix(globalPrefix);
+    app.setGlobalPrefix(globalPrefix, {
+        exclude: [{ path: 'share/:token/view', method: RequestMethod.GET }],
+    });
     const configuredCorsOrigins = (process.env.CORS_ORIGIN ?? '')
         .split(',')
         .map((origin) => origin.trim())
@@ -50,7 +52,12 @@ async function bootstrap() {
     if (existsSync(indexPath)) {
         app.use(express.static(webRoot));
         app.use((request: Request, response: Response, next: NextFunction) => {
-            if (request.method === 'GET' && !request.path.startsWith(`/${globalPrefix}`)) {
+            const isPublicMediaView = /^\/share\/[^/]+\/view\/?$/.test(request.path);
+            if (
+                request.method === 'GET' &&
+                !request.path.startsWith(`/${globalPrefix}`) &&
+                !isPublicMediaView
+            ) {
                 response.sendFile(indexPath);
                 return;
             }

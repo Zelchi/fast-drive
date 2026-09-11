@@ -3,17 +3,12 @@
     <div class="brand-mark">FD</div>
     <p class="eyebrow">FAST DRIVE</p>
     <h1>Seus arquivos, no seu espaço.</h1>
-    <p class="intro-copy">Um drive simples, privado e persistente para a sua instalação.</p>
   </section>
 
   <section class="auth-card">
     <div class="card-heading">
       <p class="eyebrow">ACESSO</p>
       <h2>{{ firstAccessDetected ? 'Ative sua conta' : 'Bem-vindo de volta' }}</h2>
-      <p>
-        {{ firstAccessDetected ? 'O servidor identificou um primeiro acesso. Crie uma senha para
-        continuar.' : 'Informe seu nick e sua senha ou serial.' }}
-      </p>
     </div>
 
     <form (ngSubmit)="submit()">
@@ -43,8 +38,6 @@
       </label>
 
       @if (firstAccessDetected) {
-      <p class="first-access-note">Primeiro acesso detectado pelo servidor.</p>
-
       <label>
         Nova senha
         <input

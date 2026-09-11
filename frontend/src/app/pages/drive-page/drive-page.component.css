@@ -432,10 +432,6 @@ h1 {
   cursor: wait;
   opacity: 0.55;
 }
-.members-help {
-  color: #666;
-  font-size: 0.68rem;
-}
 .members-empty {
   margin: 0;
   color: #666;

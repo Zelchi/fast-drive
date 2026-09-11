@@ -271,18 +271,6 @@
   border-color: #aaa;
 }
 
-.profile-help {
-  margin: -0.15rem 0 0.2rem;
-  color: #666;
-  font-size: 0.65rem;
-  line-height: 1.4;
-}
-
-.profile-help strong {
-  color: #999;
-  font-weight: 500;
-}
-
 .profile-section-label {
   margin: 0.35rem 0 0;
   padding-top: 0.85rem;

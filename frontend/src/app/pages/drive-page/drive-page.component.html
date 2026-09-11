@@ -4,7 +4,7 @@
     <div class="topbar-actions">
       <app-profile-menu />
       @if (isOwner) {
-      <a class="ghost-button" href="/admin/users" routerLink="/admin/users">Usuários</a>
+      <a class="ghost-button" href="/admin" routerLink="/admin">Usuários</a>
       }
     </div>
   </header>
@@ -22,7 +22,6 @@
   } @else if (!selectedWorkspace) {
   <section class="empty-state">
     <h1>Nenhum workspace disponível</h1>
-    <p>Peça ao proprietário para adicionar você a um workspace.</p>
   </section>
   } @else {
   <div class="drive-layout">
@@ -60,12 +59,7 @@
             [(ngModel)]="workspaceQuotaPercent"
             [disabled]="creatingWorkspace || !hasAvailableWorkspaceSpace()"
           >
-          <small>{{ formatBytes(workspaceQuotaBytes()) }} do total da aplicação</small>
         </label>
-        <small>O total alocado não pode ultrapassar a capacidade da aplicação.</small>
-        @if (!hasAvailableWorkspaceSpace()) {
-        <small>Não há espaço livre para criar outro workspace.</small>
-        }
         <button
           class="ghost-button"
           type="submit"
@@ -85,9 +79,6 @@
           >
         </div>
         <div class="capacity-track"><span [style.width.%]="allocatedPercent()"></span></div>
-        <small
-          >{{ formatBytes(storageOverview.availableBytes) }} livres para novos workspaces</small
-        >
       </div>
 
       <div class="workspace-list">
@@ -105,10 +96,6 @@
             <span class="workspace-dot"></span>
             <span class="workspace-copy">
               <span>{{ workspace.name }}</span>
-              <small
-                >{{ formatBytes(workspace.usedBytes) }} / {{ formatBytes(workspace.quotaBytes)
-                }}</small
-              >
             </span>
           </button>
         </div>
@@ -323,8 +310,6 @@
                 {{ savingMember ? 'Adicionando...' : 'Adicionar' }}
               </button>
             </form>
-            <small class="members-help">O usuário precisa estar cadastrado e ativo.</small>
-
             <div class="members-modal-summary">
               <span>Membros</span>
               <strong>{{ members.length }}</strong>
@@ -339,7 +324,6 @@
               <div class="member-row" *ngFor="let member of members">
                 <div class="member-info">
                   <strong>{{ member.nick }}</strong>
-                  <small>{{ member.role === 'OWNER' ? 'Proprietário' : 'Membro' }}</small>
                 </div>
                 @if (member.role === 'MEMBER') {
                 <button
@@ -427,10 +411,6 @@
           <div class="share-access-copy">
             <span class="share-label">Visibilidade</span>
             <strong>{{ fileShare.isPublic ? 'Público' : 'Privado' }}</strong>
-            <small>
-              {{ fileShare.isPublic ? 'Qualquer pessoa com o link poderá baixar este arquivo.' :
-              'Somente membros do workspace podem acessar este arquivo.' }}
-            </small>
           </div>
           <button
             class="share-toggle"
@@ -456,14 +436,16 @@
               {{ shareUrlCopied ? 'Copiado' : 'Copiar' }}
             </button>
           </div>
-          <small
-            >Envie este link para abrir a página do arquivo e fazer o download sem login.</small
-          >
         </div>
-        } @else {
-        <p class="share-private-note">
-          Ative o acesso público para gerar um link de download externo.
-        </p>
+        <div class="share-link-box">
+          <label for="public-share-view-link">Link público direto para mídia</label>
+          <div class="share-link-control">
+            <input id="public-share-view-link" type="text" [value]="shareViewUrl()" readonly>
+            <button class="ghost-button" type="button" (click)="copyShareViewLink()">
+              {{ shareViewUrlCopied ? 'Copiado' : 'Copiar' }}
+            </button>
+          </div>
+        </div>
         } }
       </section>
     </div>
@@ -499,7 +481,6 @@
           <span class="file-icon">F</span>
           <div>
             <strong>{{ movingFile.originalName }}</strong>
-            <small>Escolha a pasta de destino</small>
           </div>
         </div>
 

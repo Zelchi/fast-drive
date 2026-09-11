@@ -86,12 +86,6 @@ h2 {
   letter-spacing: -0.03em;
 }
 
-.intro {
-  margin-bottom: 0;
-  color: #777;
-  font-size: 0.88rem;
-}
-
 .panel,
 .serial-card {
   border: 1px solid #292929;
@@ -194,12 +188,6 @@ button:disabled {
 
 .serial-card .eyebrow {
   margin-bottom: 0.35rem;
-}
-
-.serial-help {
-  margin-bottom: 0;
-  color: #888;
-  font-size: 0.78rem;
 }
 
 code {

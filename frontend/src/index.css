@@ -123,9 +123,7 @@ input {
   white-space: nowrap;
 }
 
-.share-file-summary small,
-.share-access-copy small,
-.share-link-box small {
+.share-file-summary small {
   color: #666;
   font-size: 0.68rem;
   line-height: 1.45;
@@ -237,13 +235,6 @@ input {
 
 .share-link-control .ghost-button {
   flex: 0 0 auto;
-}
-
-.share-private-note {
-  margin: 1rem 0 0;
-  color: #777;
-  font-size: 0.76rem;
-  line-height: 1.5;
 }
 
 .upload-progress {

@@ -156,19 +156,6 @@ export class AdminUsersPageComponent {
         }).format(new Date(value));
     }
 
-    serialStatus(user: User): string {
-        if (!user.isActive) {
-            return 'Usuário desativado';
-        }
-        if (user.mustCreatePassword) {
-            return 'Primeiro acesso';
-        }
-        if (new Date(user.serialExpiresAt).getTime() <= Date.now()) {
-            return 'Serial expirado';
-        }
-        return 'Serial ativo';
-    }
-
     private async reload(): Promise<void> {
         this.loading = true;
         this.error = '';

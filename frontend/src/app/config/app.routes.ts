@@ -16,13 +16,26 @@ export const appRoutes: Route[] = [
         canActivate: [authGuard],
     },
     {
-        path: 'admin/users',
+        path: 'admin',
         component: AdminUsersPageComponent,
         canActivate: [ownerGuard],
     },
     {
-        path: 'share/:token',
-        component: SharePageComponent,
+        path: 'share',
+        children: [
+            {
+                path: '',
+                component: SharePageComponent,
+            },
+            {
+                path: ':token',
+                component: SharePageComponent,
+            },
+            {
+                path: '**',
+                component: SharePageComponent,
+            },
+        ],
     },
     { path: '', pathMatch: 'full', redirectTo: 'drive' },
     { path: '**', redirectTo: 'drive' },

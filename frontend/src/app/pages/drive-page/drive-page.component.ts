@@ -73,6 +73,7 @@ export class DrivePageComponent {
     loadingShare = false;
     savingShare = false;
     shareUrlCopied = false;
+    shareViewUrlCopied = false;
     shareError = '';
     moveOpen = false;
     movingFile: DriveFile | null = null;
@@ -401,6 +402,7 @@ export class DrivePageComponent {
         this.fileShare = null;
         this.shareError = '';
         this.shareUrlCopied = false;
+        this.shareViewUrlCopied = false;
         this.shareOpen = true;
         this.loadingShare = true;
         this.changeDetectorRef.markForCheck();
@@ -424,6 +426,7 @@ export class DrivePageComponent {
         this.loadingShare = false;
         this.savingShare = false;
         this.shareUrlCopied = false;
+        this.shareViewUrlCopied = false;
         this.shareError = '';
     }
 
@@ -449,6 +452,7 @@ export class DrivePageComponent {
             if (this.sharingFile?.id === file.id) {
                 this.fileShare = response.share;
                 this.shareUrlCopied = false;
+                this.shareViewUrlCopied = false;
             }
         } catch (error: unknown) {
             this.shareError = this.readError(error);
@@ -477,8 +481,32 @@ export class DrivePageComponent {
         }
     }
 
+    async copyShareViewLink(): Promise<void> {
+        const share = this.fileShare;
+        const url = this.shareViewUrl();
+        if (!share?.isPublic || !url || !navigator.clipboard) {
+            this.shareError = 'O navegador não permite copiar o link de compartilhamento.';
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(url);
+            this.shareViewUrlCopied = true;
+            this.shareError = '';
+        } catch (error: unknown) {
+            this.shareError = this.readError(error);
+        } finally {
+            this.changeDetectorRef.markForCheck();
+        }
+    }
+
     sharePageUrl(): string {
         return this.fileShare?.url ?? '';
+    }
+
+    shareViewUrl(): string {
+        const pageUrl = this.sharePageUrl();
+        return pageUrl ? `${pageUrl.replace(/\/+$/, '')}/view` : '';
     }
 
     async openContextFolder(): Promise<void> {
@@ -1030,11 +1058,6 @@ export class DrivePageComponent {
 
     hasAvailableWorkspaceSpace(): boolean {
         return this.availableWorkspacePercent() >= 1;
-    }
-
-    workspaceQuotaBytes(): number {
-        const percent = Math.max(0, Math.min(100, Number(this.workspaceQuotaPercent) || 0));
-        return Math.floor((this.storageOverview.totalBytes * percent) / 100);
     }
 
     private async reload(): Promise<void> {

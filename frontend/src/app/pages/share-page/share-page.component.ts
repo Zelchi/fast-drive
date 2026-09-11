@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { DomSanitizer, type SafeResourceUrl } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { DriveApiService, type PublicShareMetadata } from '../../core/drive-api.service';
 
@@ -14,6 +15,7 @@ import { DriveApiService, type PublicShareMetadata } from '../../core/drive-api.
 export class SharePageComponent implements OnInit {
     private readonly changeDetectorRef = inject(ChangeDetectorRef);
     private readonly driveApi = inject(DriveApiService);
+    private readonly route = inject(ActivatedRoute);
     private readonly sanitizer = inject(DomSanitizer);
 
     share: PublicShareMetadata | null = null;
@@ -33,7 +35,7 @@ export class SharePageComponent implements OnInit {
     private audioVolumePointerId: number | null = null;
 
     async ngOnInit(): Promise<void> {
-        this.token = window.location.pathname.split('/').filter(Boolean).at(-1) ?? '';
+        this.token = this.route.snapshot.paramMap.get('token')?.trim() ?? '';
         await this.loadShare();
     }
 
