@@ -48,3 +48,9 @@ Thumbs.db
 /backups
 /.env
 /.tmp-integration
+
+# SQLite databases and journal files
+*.sqlite
+*.sqlite3
+*.sqlite-*
+backend/data/fast-drive.sqlite

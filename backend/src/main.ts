@@ -23,6 +23,8 @@ async function bootstrap() {
         .filter(Boolean);
     const allowedCorsOrigins = new Set([
         ...configuredCorsOrigins,
+        'http://localhost:7123',
+        'http://127.0.0.1:7123',
         'http://tauri.localhost',
         'https://tauri.localhost',
         'tauri://localhost',

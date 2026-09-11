@@ -11,6 +11,7 @@ describe('server configuration', () => {
     it('adds HTTPS when the address has no protocol', () => {
         expect(normalizeServerUrl('drive.example.com')).toBe('https://drive.example.com');
         expect(normalizeServerUrl('drive.example.com:7000')).toBe('https://drive.example.com:7000');
+        expect(normalizeServerUrl('127.0.0.1:7000')).toBe('http://127.0.0.1:7000');
     });
 
     it('rejects addresses that cannot be used as an API origin', () => {

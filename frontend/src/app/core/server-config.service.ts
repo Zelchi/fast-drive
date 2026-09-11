@@ -9,20 +9,50 @@ function isTauriRuntime(): boolean {
     );
 }
 
+function isLocalNetworkHost(hostname: string): boolean {
+    const normalizedHostname = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+    if (
+        normalizedHostname === 'localhost' ||
+        normalizedHostname === 'localhost.localdomain' ||
+        normalizedHostname === '::1' ||
+        normalizedHostname.endsWith('.local')
+    ) {
+        return true;
+    }
+
+    const octets = normalizedHostname.split('.').map(Number);
+    if (
+        octets.length !== 4 ||
+        octets.some((octet) => !Number.isInteger(octet) || octet < 0 || octet > 255)
+    ) {
+        return false;
+    }
+
+    return (
+        octets[0] === 10 ||
+        octets[0] === 127 ||
+        (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) ||
+        (octets[0] === 192 && octets[1] === 168)
+    );
+}
+
 export function normalizeServerUrl(value: string): string {
     const trimmedValue = value.trim();
     if (!trimmedValue) {
         throw new Error('Informe o endereço da aplicação.');
     }
 
-    const inputUrl = /^[a-z][a-z\d+.-]*:\/\//i.test(trimmedValue)
-        ? trimmedValue
-        : `https://${trimmedValue}`;
+    const hasProtocol = /^[a-z][a-z\d+.-]*:\/\//i.test(trimmedValue);
+    const inputUrl = hasProtocol ? trimmedValue : `https://${trimmedValue}`;
     let parsedUrl: URL;
     try {
         parsedUrl = new URL(inputUrl);
     } catch {
         throw new Error('Informe um endereço válido, como https://drive.exemplo.com.');
+    }
+
+    if (!hasProtocol && isLocalNetworkHost(parsedUrl.hostname)) {
+        parsedUrl.protocol = 'http:';
     }
 
     if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
