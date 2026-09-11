@@ -51,5 +51,15 @@ jobs:
           git checkout main
           git pull --ff-only origin main
           docker compose up --build -d
-          curl --fail --silent --show-error http://127.0.0.1:7000/api/health
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:7000/api/health; then
+              exit 0
+            fi
+
+            sleep 2
+          done
+
+          docker compose logs --no-color --tail=100 fast-drive
+          exit 1
           REMOTE
