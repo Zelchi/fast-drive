@@ -61,10 +61,12 @@ jobs:
             process.exit(1);
           }
 
+          const isRawKey = /^untrusted comment:/m.test(secret);
+          const encodedKey = isRawKey ? Buffer.from(secret, 'utf8').toString('base64') : secret.replace(/\s+/g, '');
           let decoded = secret;
-          if (!/^untrusted comment:/m.test(secret)) {
+          if (!isRawKey) {
             try {
-              decoded = Buffer.from(secret, 'base64').toString('utf8');
+              decoded = Buffer.from(encodedKey, 'base64').toString('utf8');
             } catch {
               decoded = '';
             }
@@ -78,8 +80,11 @@ jobs:
           }
 
           const keyPath = path.join(process.env.RUNNER_TEMP, 'fast-drive-updater.key');
-          fs.writeFileSync(keyPath, secret, { mode: 0o600 });
-          fs.appendFileSync(process.env.GITHUB_ENV, `TAURI_SIGNING_PRIVATE_KEY_PATH=${keyPath}\n`);
+          fs.writeFileSync(keyPath, encodedKey, { mode: 0o600 });
+          fs.appendFileSync(
+            process.env.GITHUB_ENV,
+            `TAURI_SIGNING_PRIVATE_KEY_PATH=${keyPath}\nTAURI_SIGNING_PRIVATE_KEY=${encodedKey}\n`,
+          );
           NODE
 
       - name: Configure updater endpoint
