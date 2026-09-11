@@ -9,16 +9,49 @@ permissions:
   contents: write
 
 jobs:
+  build-desktop-frontend:
+    name: Build desktop frontend
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Install JavaScript dependencies
+        run: yarn install --frozen-lockfile --ignore-engines
+
+      - name: Build frontend assets
+        run: yarn build:desktop-frontend
+
+      - name: Upload frontend assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-frontend
+          path: frontend/dist/frontend/browser/**
+          if-no-files-found: error
+          retention-days: 1
+
   publish-tauri:
+    needs: build-desktop-frontend
     strategy:
       fail-fast: false
       matrix:
         include:
           - platform: macos-latest
+            target: aarch64-apple-darwin
             args: "--target aarch64-apple-darwin"
           - platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
             args: ""
           - platform: windows-latest
+            target: x86_64-pc-windows-msvc
             args: ""
 
     runs-on: ${{ matrix.platform }}
@@ -31,11 +64,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
+          cache: yarn
+          cache-dependency-path: yarn.lock
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || '' }}
+
+      - name: Cache Rust and Tauri build files
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            ~/.cache/tauri
+            application/src-tauri/target
+          key: ${{ runner.os }}-${{ matrix.target }}-cargo-${{ hashFiles('application/src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.target }}-cargo-
 
       - name: Install Linux dependencies
         if: matrix.platform == 'ubuntu-22.04'
@@ -45,6 +93,12 @@ jobs:
 
       - name: Install JavaScript dependencies
         run: yarn install --frozen-lockfile --ignore-engines
+
+      - name: Download prebuilt frontend
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-frontend
+          path: frontend/dist/frontend/browser
 
       - name: Prepare updater signing key
         shell: bash
@@ -95,6 +149,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NO_STRIP: "1"
+          FAST_DRIVE_SKIP_FRONTEND_BUILD: "1"
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: application
