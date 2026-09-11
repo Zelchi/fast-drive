@@ -1,0 +1,54 @@
+services:
+  fast-drive:
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: fast-drive:latest
+    container_name: fast-drive
+    restart: unless-stopped
+    init: true
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "${APP_PORT:-7000}:7000"
+    environment:
+      NODE_ENV: production
+      API_PORT: "7000"
+      DB_FILE_NAME: "file:./data/fast-drive.sqlite"
+      STORAGE_ROOT: "./data/storage"
+      UPLOAD_TEMP_ROOT: "/tmp/fast-drive-uploads"
+      WEB_DIST_ROOT: "/app/frontend/dist/frontend/browser"
+      DRIZZLE_MIGRATIONS_FOLDER: "./drizzle"
+      PUBLIC_SHARE_BASE_URL: "${PUBLIC_SHARE_BASE_URL:-http://localhost:7000}"
+      CORS_ORIGIN: "${CORS_ORIGIN:-}"
+      OWNER_NICK: "${OWNER_NICK:-owner}"
+      OWNER_SERIAL: "${OWNER_SERIAL:?Defina OWNER_SERIAL no arquivo .env antes do deploy}"
+      OWNER_WORKSPACE: "${OWNER_WORKSPACE:-Meu workspace}"
+      STORAGE_QUOTA_BYTES: "${STORAGE_QUOTA_BYTES:-10G}"
+      SERIAL_TTL_DAYS: "${SERIAL_TTL_DAYS:-3}"
+      SESSION_TTL_SECONDS: "${SESSION_TTL_SECONDS:-2592000}"
+      COOKIE_SECURE: "${COOKIE_SECURE:-false}"
+      MAX_FILE_SIZE_BYTES: "${MAX_FILE_SIZE_BYTES:-512M}"
+      LOGIN_RATE_LIMIT_MAX: "${LOGIN_RATE_LIMIT_MAX:-10}"
+      LOGIN_RATE_LIMIT_WINDOW_SECONDS: "${LOGIN_RATE_LIMIT_WINDOW_SECONDS:-60}"
+    volumes:
+      - fast_drive_data:/app/backend/data
+    tmpfs:
+      - /tmp
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          fetch('http://127.0.0.1:7000/api/health').then((response) => {
+          if (!response.ok) process.exit(1);
+          }).catch(() => process.exit(1));
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  fast_drive_data:

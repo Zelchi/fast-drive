@@ -1,0 +1,148 @@
+.auth-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  gap: clamp(3rem, 10vw, 9rem);
+  align-items: center;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(2rem, 6vw, 5rem);
+}
+
+.auth-intro {
+  max-width: 560px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 2.25rem;
+  border: 1px solid #e5e5e5;
+  color: #0a0a0a;
+  background: #f2f2f2;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: -0.08em;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  color: #808080;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+h1 {
+  max-width: 600px;
+  margin: 0;
+  color: #f2f2f2;
+  font-size: clamp(2.7rem, 6vw, 5.8rem);
+  line-height: 0.98;
+  letter-spacing: -0.075em;
+}
+
+.intro-copy {
+  max-width: 390px;
+  margin: 1.5rem 0 0;
+  color: #999;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.auth-card {
+  padding: clamp(1.35rem, 4vw, 2.25rem);
+  border: 1px solid #292929;
+  background: #111;
+}
+
+.card-heading h2 {
+  margin: 0;
+  color: #f2f2f2;
+  font-size: 1.7rem;
+  letter-spacing: -0.05em;
+}
+
+.card-heading p:last-child {
+  margin: 0.6rem 0 0;
+  color: #8b8b8b;
+  line-height: 1.5;
+}
+
+form {
+  display: grid;
+  gap: 1rem;
+}
+
+label {
+  display: grid;
+  gap: 0.4rem;
+  color: #c7c7c7;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  padding: 0.8rem 0.85rem;
+  border: 1px solid #303030;
+  border-radius: 2px;
+  outline: none;
+  color: #f2f2f2;
+  background: #0a0a0a;
+  font: inherit;
+}
+
+input:focus {
+  border-color: #bdbdbd;
+}
+
+.first-access-note {
+  margin: 0;
+  padding: 0.7rem 0.8rem;
+  border-left: 2px solid #bdbdbd;
+  color: #bdbdbd;
+  background: #181818;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.primary-button {
+  margin-top: 0.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #f2f2f2;
+  border-radius: 2px;
+  color: #0a0a0a;
+  background: #f2f2f2;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.primary-button:hover {
+  background: #d2d2d2;
+}
+.primary-button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+.form-error {
+  margin: 0;
+  color: #c0c0c0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 800px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    padding: 2rem 1.25rem;
+  }
+
+  h1 {
+    font-size: clamp(2.8rem, 16vw, 5rem);
+  }
+}

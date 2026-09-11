@@ -1,0 +1,10 @@
+.git
+.env
+**/node_modules
+**/dist
+**/data
+**/coverage
+**/.angular
+**/*.tsbuildinfo
+**/target
+application/

@@ -1,0 +1,203 @@
+.modal-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 78%);
+}
+
+.modal-dialog {
+  position: relative;
+  width: min(100%, 460px);
+  padding: 1.75rem;
+  border: 1px solid #4a4a4a;
+  border-left: 3px solid #aaa;
+  border-radius: 2px;
+  color: #d0d0d0;
+  background: #111;
+  box-shadow: 0 18px 60px rgb(0 0 0 / 45%);
+}
+
+.variant-success {
+  border-left-color: #f2f2f2;
+}
+
+.variant-warning {
+  border-left-color: #888;
+}
+
+.variant-error {
+  border-left-color: #666;
+}
+
+.close-button {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.9rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  border: 0;
+  color: #777;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.close-button:hover {
+  color: #f2f2f2;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  color: #777;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+h2 {
+  margin: 0 2rem 0.65rem 0;
+  color: #f2f2f2;
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
+}
+
+.modal-message {
+  margin: 0;
+  color: #aaa;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.modal-input-label {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1.25rem;
+  color: #888;
+  font-size: 0.72rem;
+}
+
+.modal-input-label.range-input {
+  gap: 0.7rem;
+}
+
+.modal-input-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.modal-input-heading strong {
+  color: #eee;
+  font-weight: 600;
+}
+
+.modal-input-label input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #383838;
+  border-radius: 2px;
+  outline: 0;
+  color: #eee;
+  background: #090909;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.modal-input-control {
+  display: flex;
+  align-items: stretch;
+}
+
+.modal-input-control.range-control {
+  display: block;
+}
+
+.modal-input-control.has-suffix input {
+  min-width: 0;
+  border-right: 0;
+  border-radius: 2px 0 0 2px;
+}
+
+.modal-input-suffix {
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  border: 1px solid #383838;
+  border-left: 0;
+  border-radius: 0 2px 2px 0;
+  color: #777;
+  background: #151515;
+  font-size: 0.82rem;
+}
+
+.modal-input-control.has-suffix input:focus + .modal-input-suffix {
+  border-color: #aaa;
+}
+
+.modal-input-label input:focus {
+  border-color: #aaa;
+}
+
+.modal-input-label input[type="range"] {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: #aaa;
+  cursor: pointer;
+}
+
+.modal-input-label input[type="range"]:focus {
+  border-color: transparent;
+}
+
+.input-error {
+  margin: 0.5rem 0 0;
+  color: #aaa;
+  font-size: 0.75rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.primary-button,
+.secondary-button {
+  padding: 0.7rem 0.9rem;
+  border-radius: 2px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.76rem;
+}
+
+.primary-button {
+  border: 1px solid #f2f2f2;
+  color: #0a0a0a;
+  background: #f2f2f2;
+  font-weight: 700;
+}
+
+.primary-button:hover {
+  background: #d2d2d2;
+}
+
+.secondary-button {
+  border: 1px solid #3a3a3a;
+  color: #aaa;
+  background: transparent;
+}
+
+.secondary-button:hover {
+  border-color: #aaa;
+  color: #f2f2f2;
+}

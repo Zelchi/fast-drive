@@ -1,0 +1,16 @@
+{
+    "name": "@fast-drive/application",
+    "version": "0.1.0",
+    "private": true,
+    "packageManager": "yarn@1.22.22",
+    "scripts": {
+        "tauri": "tauri",
+        "dev": "tauri dev",
+        "build": "node scripts/build.mjs",
+        "icon": "tauri icon ../frontend/public/favicon.svg",
+        "configure-updater": "node scripts/configure-updater-endpoint.mjs"
+    },
+    "devDependencies": {
+        "@tauri-apps/cli": "^2.11.4"
+    }
+}

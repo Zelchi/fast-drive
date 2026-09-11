@@ -1,0 +1,43 @@
+.app-scroll-viewport {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@supports (height: 100dvh) {
+  .app-scroll-viewport {
+    height: 100dvh;
+  }
+}
+
+.app-scrollbar-track {
+  position: fixed;
+  z-index: 800;
+  top: 0.75rem;
+  right: 0.55rem;
+  bottom: 0.75rem;
+  width: 8px;
+  border: 1px solid #303030;
+  background: #171717;
+  cursor: pointer;
+}
+
+.app-scrollbar-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 50px;
+  background: linear-gradient(180deg, #a0a0a0, #505050);
+  cursor: grab;
+  transition: background 140ms ease;
+}
+
+.app-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #bdbdbd, #666);
+}
+
+.app-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #d6d6d6, #858585);
+  cursor: grabbing;
+}

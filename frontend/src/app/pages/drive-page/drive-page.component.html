@@ -1,0 +1,617 @@
+<main class="drive-shell">
+  <header class="topbar">
+    <a class="brand" href="/drive" routerLink="/drive"><span>FD</span> Fast Drive</a>
+    <div class="topbar-actions">
+      <app-profile-menu />
+      @if (isOwner) {
+      <a class="ghost-button" href="/admin/users" routerLink="/admin/users">Usuários</a>
+      }
+    </div>
+  </header>
+
+  @if (loading) {
+  <section class="empty-state">
+    <p>{{ loadingStep }}</p>
+  </section>
+  } @else if (error && !selectedWorkspace) {
+  <section class="empty-state">
+    <h1>Não foi possível carregar o drive</h1>
+    <p>{{ error }}</p>
+    <button class="ghost-button" type="button" (click)="retryLoad()">Tentar novamente</button>
+  </section>
+  } @else if (!selectedWorkspace) {
+  <section class="empty-state">
+    <h1>Nenhum workspace disponível</h1>
+    <p>Peça ao proprietário para adicionar você a um workspace.</p>
+  </section>
+  } @else {
+  <div class="drive-layout">
+    <aside class="sidebar">
+      <div class="workspace-heading">
+        <p class="eyebrow">WORKSPACES</p>
+        @if (isOwner) {
+        <button class="workspace-new-button" type="button" (click)="toggleWorkspaceForm()">
+          {{ workspaceFormOpen ? 'Fechar' : 'Novo' }}
+        </button>
+        }
+      </div>
+
+      @if (workspaceFormOpen && isOwner) {
+      <form class="workspace-form" (ngSubmit)="createWorkspace()">
+        <label>
+          Nome
+          <input
+            name="workspaceName"
+            [(ngModel)]="workspaceName"
+            placeholder="Ex.: Equipe"
+            required
+          >
+        </label>
+        <label class="range-field">
+          <span class="range-heading"
+            ><span>Quota</span><strong>{{ workspaceQuotaPercent }}%</strong></span
+          >
+          <input
+            name="workspaceQuotaPercent"
+            type="range"
+            min="1"
+            [max]="maxWorkspaceQuotaPercent()"
+            step="1"
+            [(ngModel)]="workspaceQuotaPercent"
+            [disabled]="creatingWorkspace || !hasAvailableWorkspaceSpace()"
+          >
+          <small>{{ formatBytes(workspaceQuotaBytes()) }} do total da aplicação</small>
+        </label>
+        <small>O total alocado não pode ultrapassar a capacidade da aplicação.</small>
+        @if (!hasAvailableWorkspaceSpace()) {
+        <small>Não há espaço livre para criar outro workspace.</small>
+        }
+        <button
+          class="ghost-button"
+          type="submit"
+          [disabled]="creatingWorkspace || !hasAvailableWorkspaceSpace()"
+        >
+          {{ creatingWorkspace ? 'Criando...' : 'Criar workspace' }}
+        </button>
+      </form>
+      }
+
+      <div class="storage-overview">
+        <div class="storage-overview-label">
+          <span>Alocado</span>
+          <strong
+            >{{ formatBytes(storageOverview.allocatedBytes) }} / {{
+            formatBytes(storageOverview.totalBytes) }}</strong
+          >
+        </div>
+        <div class="capacity-track"><span [style.width.%]="allocatedPercent()"></span></div>
+        <small
+          >{{ formatBytes(storageOverview.availableBytes) }} livres para novos workspaces</small
+        >
+      </div>
+
+      <div class="workspace-list">
+        <div
+          class="workspace-row"
+          *ngFor="let workspace of workspaces"
+          (contextmenu)="openWorkspaceContextMenu($event, workspace)"
+        >
+          <button
+            class="workspace-item"
+            [class.selected]="workspace.id === selectedWorkspace.id"
+            type="button"
+            (click)="selectWorkspace(workspace)"
+          >
+            <span class="workspace-dot"></span>
+            <span class="workspace-copy">
+              <span>{{ workspace.name }}</span>
+              <small
+                >{{ formatBytes(workspace.usedBytes) }} / {{ formatBytes(workspace.quotaBytes)
+                }}</small
+              >
+            </span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="content-heading">
+        <div class="content-title">
+          <p class="eyebrow">{{ selectedWorkspace.name }}</p>
+          <h1>{{ currentFolder?.name || 'Arquivos' }}</h1>
+          <div class="breadcrumbs">
+            <button
+              type="button"
+              [class.drop-target-active]="isDropTarget(null)"
+              (click)="goToRoot()"
+              (dragover)="onFileDragOver($event, null)"
+              (dragleave)="onFileDragLeave($event, null)"
+              (drop)="onFileDrop($event, null)"
+            >
+              Início
+            </button>
+            @for (folder of folderPath; track folder.id; let last = $last) {
+            <span>/</span>
+            @if (last) {
+            <strong aria-current="page">{{ folder.name }}</strong>
+            } @else {
+            <button
+              type="button"
+              [class.drop-target-active]="isDropTarget(folder.id)"
+              (click)="goToBreadcrumb($index)"
+              (dragover)="onFileDragOver($event, folder.id)"
+              (dragleave)="onFileDragLeave($event, folder.id)"
+              (drop)="onFileDrop($event, folder.id)"
+            >
+              {{ folder.name }}
+            </button>
+            } }
+          </div>
+        </div>
+        <div class="content-actions">
+          @if (selectedWorkspace.role === 'OWNER') {
+          <button class="ghost-button" type="button" (click)="toggleMembers()">
+            {{ membersOpen ? 'Fechar membros' : 'Membros' }}
+          </button>
+          }
+          <label class="upload-button" [class.disabled]="uploading">
+            {{ uploading ? 'Enviando...' : 'Enviar arquivo' }}
+            <input type="file" [disabled]="uploading" (change)="upload($event)">
+          </label>
+        </div>
+      </div>
+
+      @if (uploading) {
+      <div class="upload-progress" role="status" aria-live="polite">
+        <div class="upload-progress-heading">
+          <span>{{ uploadFileName }}</span>
+          <strong>{{ uploadProgress }}%</strong>
+        </div>
+        <div
+          class="upload-progress-track"
+          role="progressbar"
+          aria-label="Progresso do upload"
+          aria-valuemin="0"
+          [attr.aria-valuenow]="uploadProgress"
+          aria-valuemax="100"
+        >
+          <span [style.width.%]="uploadProgress"></span>
+        </div>
+      </div>
+      }
+
+      <div class="toolbar">
+        <form (ngSubmit)="createFolder()" class="new-folder-form">
+          <input name="folderName" [(ngModel)]="folderName" placeholder="Nome da nova pasta">
+          <button class="ghost-button" type="submit">Criar pasta</button>
+        </form>
+        <span class="item-count"
+          >{{ (listing?.folders?.length || 0) + (listing?.files?.length || 0) }} itens</span
+        >
+      </div>
+
+      @if (error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+      }
+
+      <div class="file-list">
+        <div class="list-header">
+          <span>Nome</span><span>Tipo</span><span>Tamanho</span><span></span>
+        </div>
+        @if (currentFolder) {
+        <button
+          class="file-row folder-row parent-folder-row"
+          [class.drop-target-active]="isDropTarget(parentDropTargetId())"
+          type="button"
+          [attr.aria-label]="'Voltar para ' + parentFolderName()"
+          [title]="'Voltar para ' + parentFolderName()"
+          (click)="goToParent()"
+          (dragover)="onFileDragOver($event, parentDropTargetId())"
+          (dragleave)="onFileDragLeave($event, parentDropTargetId())"
+          (drop)="onFileDrop($event, parentDropTargetId())"
+        >
+          <span class="file-name">
+            <span class="file-icon parent-folder-icon">↩</span>
+            <span class="parent-folder-copy">
+              <strong>Pasta pai</strong>
+              <small>{{ parentFolderName() }}</small>
+            </span>
+          </span>
+          <span>Pasta</span><span>—</span><span>↑</span>
+        </button>
+        }
+        <button
+          class="file-row folder-row"
+          *ngFor="let folder of listing?.folders"
+          type="button"
+          [class.drop-target-active]="isDropTarget(folder.id)"
+          (click)="openFolder(folder)"
+          (contextmenu)="openContextMenu($event, 'folder', folder)"
+          (dragover)="onFileDragOver($event, folder.id)"
+          (dragleave)="onFileDragLeave($event, folder.id)"
+          (drop)="onFileDrop($event, folder.id)"
+        >
+          <span class="file-name"
+            ><span class="file-icon folder-icon">/</span>{{ folder.name }}</span
+          ><span>Pasta</span><span>—</span><span>›</span>
+        </button>
+        <div
+          class="file-row"
+          *ngFor="let file of listing?.files"
+          draggable="true"
+          [class.is-dragging]="draggedFile?.id === file.id"
+          (contextmenu)="openContextMenu($event, 'file', file)"
+          (dragstart)="onFileDragStart($event, file)"
+          (dragend)="onFileDragEnd()"
+        >
+          <span class="file-name"><span class="file-icon">▤</span>{{ file.originalName }}</span>
+          <span>{{ file.mimeType }}</span>
+          <span>{{ formatBytes(file.size) }}</span>
+          <span class="file-share-action">
+            <button
+              class="share-button"
+              type="button"
+              [attr.aria-label]="'Compartilhar ' + file.originalName"
+              title="Compartilhar arquivo"
+              (click)="shareFile(file)"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="18" cy="5" r="2.5"></circle>
+                <circle cx="6" cy="12" r="2.5"></circle>
+                <circle cx="18" cy="19" r="2.5"></circle>
+                <path d="m8.2 10.8 7.6-4.5M8.2 13.2l7.6 4.5"></path>
+              </svg>
+            </button>
+          </span>
+        </div>
+        @if (!listing?.folders?.length && !listing?.files?.length) {
+        <div class="empty-list">Este local ainda está vazio.</div>
+        }
+      </div>
+    </section>
+
+    @if (membersOpen && selectedWorkspace.role === 'OWNER') {
+    <div
+      class="members-modal-backdrop"
+      role="presentation"
+      (pointerdown)="onMembersBackdropPointerDown($event)"
+    >
+      <section
+        class="members-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="members-modal-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div
+          #membersModalViewport
+          id="members-modal-viewport"
+          class="members-modal-viewport"
+          (scroll)="syncMembersScrollbar()"
+          (wheel)="onMembersModalWheel($event)"
+        >
+          <div class="members-modal-content">
+            <div class="members-modal-heading">
+              <div>
+                <p class="eyebrow">ACESSO</p>
+                <h2 id="members-modal-title">Membros do workspace</h2>
+              </div>
+              <button
+                class="modal-close-button"
+                type="button"
+                aria-label="Fechar membros"
+                (click)="membersOpen = false"
+              >
+                ×
+              </button>
+            </div>
+
+            <form class="member-form" (ngSubmit)="addWorkspaceMember()">
+              <input
+                name="memberNick"
+                [(ngModel)]="memberNick"
+                autocomplete="off"
+                placeholder="Nick do usuário"
+                required
+              >
+              <button
+                class="ghost-button"
+                type="submit"
+                [disabled]="savingMember || loadingMembers || !memberNick"
+              >
+                {{ savingMember ? 'Adicionando...' : 'Adicionar' }}
+              </button>
+            </form>
+            <small class="members-help">O usuário precisa estar cadastrado e ativo.</small>
+
+            <div class="members-modal-summary">
+              <span>Membros</span>
+              <strong>{{ members.length }}</strong>
+            </div>
+
+            @if (loadingMembers) {
+            <p class="members-empty">Carregando membros...</p>
+            } @else if (!members.length) {
+            <p class="members-empty">Nenhum membro encontrado.</p>
+            } @else {
+            <div class="member-list">
+              <div class="member-row" *ngFor="let member of members">
+                <div class="member-info">
+                  <strong>{{ member.nick }}</strong>
+                  <small>{{ member.role === 'OWNER' ? 'Proprietário' : 'Membro' }}</small>
+                </div>
+                @if (member.role === 'MEMBER') {
+                <button
+                  class="member-remove"
+                  type="button"
+                  [disabled]="savingMember"
+                  (click)="removeWorkspaceMember(member)"
+                >
+                  Remover
+                </button>
+                }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+        <div
+          class="members-scrollbar-track"
+          [class.is-disabled]="!membersScrollbarVisible"
+          role="scrollbar"
+          tabindex="0"
+          aria-controls="members-modal-viewport"
+          aria-label="Rolagem da lista de membros"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          (click)="onMembersScrollbarTrackClick($event)"
+          (keydown)="onMembersScrollbarKeydown($event)"
+        >
+          <div
+            class="members-scrollbar-thumb"
+            [style.height.px]="membersScrollbarThumbHeight || null"
+            [style.transform]="'translateY(' + membersScrollbarThumbOffset + 'px)'"
+            (mousedown)="startMembersScrollbarDrag($event)"
+          ></div>
+        </div>
+      </section>
+    </div>
+    } @if (shareOpen && sharingFile) {
+    <div
+      class="share-modal-backdrop"
+      role="presentation"
+      (pointerdown)="onShareBackdropPointerDown($event)"
+    >
+      <section
+        class="share-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="share-modal-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="share-modal-heading">
+          <div>
+            <p class="eyebrow">ACESSO DO ARQUIVO</p>
+            <h2 id="share-modal-title">Compartilhar arquivo</h2>
+          </div>
+          <button
+            class="modal-close-button"
+            type="button"
+            aria-label="Fechar compartilhamento"
+            (click)="closeShareModal()"
+          >
+            x
+          </button>
+        </div>
+
+        <div class="share-file-summary">
+          <span class="file-icon">F</span>
+          <div>
+            <strong>{{ sharingFile.originalName }}</strong>
+            <small>{{ formatBytes(sharingFile.size) }}</small>
+          </div>
+        </div>
+
+        @if (loadingShare) {
+        <p class="share-status">Carregando configurações...</p>
+        } @else if (!fileShare) {
+        <p class="share-status share-status-error" role="alert">
+          {{ shareError || 'Nao foi possivel carregar as configuracoes de compartilhamento.' }}
+        </p>
+        } @else { @if (shareError) {
+        <p class="share-status share-status-error" role="alert">{{ shareError }}</p>
+        }
+        <div class="share-access-row">
+          <div class="share-access-copy">
+            <span class="share-label">Visibilidade</span>
+            <strong>{{ fileShare.isPublic ? 'Público' : 'Privado' }}</strong>
+            <small>
+              {{ fileShare.isPublic ? 'Qualquer pessoa com o link poderá baixar este arquivo.' :
+              'Somente membros do workspace podem acessar este arquivo.' }}
+            </small>
+          </div>
+          <button
+            class="share-toggle"
+            type="button"
+            [class.is-public]="fileShare.isPublic"
+            [attr.aria-pressed]="fileShare.isPublic"
+            [attr.aria-label]="
+                    fileShare.isPublic ? 'Tornar arquivo privado' : 'Tornar arquivo público'
+                  "
+            [disabled]="savingShare"
+            (click)="toggleFileShare()"
+          >
+            <span></span>
+          </button>
+        </div>
+
+        @if (fileShare.isPublic) {
+        <div class="share-link-box">
+          <label for="public-share-link">Link público</label>
+          <div class="share-link-control">
+            <input id="public-share-link" type="text" [value]="sharePageUrl()" readonly>
+            <button class="ghost-button" type="button" (click)="copyShareLink()">
+              {{ shareUrlCopied ? 'Copiado' : 'Copiar' }}
+            </button>
+          </div>
+          <small
+            >Envie este link para abrir a página do arquivo e fazer o download sem login.</small
+          >
+        </div>
+        } @else {
+        <p class="share-private-note">
+          Ative o acesso público para gerar um link de download externo.
+        </p>
+        } }
+      </section>
+    </div>
+    } @if (moveOpen && movingFile) {
+    <div
+      class="share-modal-backdrop move-modal-backdrop"
+      role="presentation"
+      (pointerdown)="onMoveBackdropPointerDown($event)"
+    >
+      <section
+        class="share-modal move-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="move-modal-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="share-modal-heading">
+          <div>
+            <p class="eyebrow">ORGANIZAÇÃO</p>
+            <h2 id="move-modal-title">Mover arquivo</h2>
+          </div>
+          <button
+            class="modal-close-button"
+            type="button"
+            aria-label="Fechar movimentação"
+            (click)="closeMoveModal()"
+          >
+            ×
+          </button>
+        </div>
+
+        <div class="share-file-summary">
+          <span class="file-icon">F</span>
+          <div>
+            <strong>{{ movingFile.originalName }}</strong>
+            <small>Escolha a pasta de destino</small>
+          </div>
+        </div>
+
+        @if (loadingMove) {
+        <p class="share-status">Carregando pastas...</p>
+        } @else { @if (moveError) {
+        <p class="share-status share-status-error" role="alert">{{ moveError }}</p>
+        }
+        <label class="move-folder-field" for="move-folder-select">
+          Pasta de destino
+          <select id="move-folder-select" [(ngModel)]="moveTargetFolderId" [disabled]="savingMove">
+            <option value="">Raiz do workspace</option>
+            <option *ngFor="let option of moveFolderOptions" [value]="option.folder.id">
+              {{ option.label }}
+            </option>
+          </select>
+        </label>
+        <div class="move-modal-actions">
+          <button class="secondary-button" type="button" (click)="closeMoveModal()">
+            Cancelar
+          </button>
+          <button
+            class="primary-button"
+            type="button"
+            [disabled]="savingMove"
+            (click)="confirmMoveFile()"
+          >
+            {{ savingMove ? 'Movendo...' : 'Mover arquivo' }}
+          </button>
+        </div>
+        }
+      </section>
+    </div>
+    }
+  </div>
+
+  @if (contextMenuOpen) {
+  <div class="context-menu-backdrop" role="presentation" (click)="closeContextMenu()"></div>
+  <div
+    class="context-menu"
+    role="menu"
+    [style.left.px]="contextMenuX"
+    [style.top.px]="contextMenuY"
+    (click)="$event.stopPropagation()"
+  >
+    <span class="context-menu-type">
+      {{ contextMenuType === 'file' ? 'ARQUIVO' : contextMenuType === 'folder' ? 'PASTA' :
+      'WORKSPACE' }}
+    </span>
+    <strong class="context-menu-name">
+      {{ contextMenuType === 'file' ? contextMenuFile?.originalName : contextMenuType === 'folder' ?
+      contextMenuFolder?.name : contextMenuWorkspace?.name }}
+    </strong>
+    <div class="context-menu-divider"></div>
+
+    @if (contextMenuType === 'workspace') {
+    <button
+      class="context-menu-item"
+      type="button"
+      role="menuitem"
+      (click)="openNewWorkspaceForm()"
+    >
+      <span class="context-menu-icon">+</span>
+      Novo workspace
+    </button>
+    <button
+      class="context-menu-item"
+      type="button"
+      role="menuitem"
+      (click)="updateContextWorkspaceQuota()"
+    >
+      <span class="context-menu-icon">⌁</span>
+      Alterar quota
+    </button>
+    <button
+      class="context-menu-item"
+      type="button"
+      role="menuitem"
+      (click)="renameContextWorkspace()"
+    >
+      <span class="context-menu-icon">✎</span>
+      Renomear
+    </button>
+    } @else { @if (contextMenuType === 'file') {
+    <button class="context-menu-item" type="button" role="menuitem" (click)="downloadContextFile()">
+      <span class="context-menu-icon">↓</span>
+      Baixar
+    </button>
+    <button class="context-menu-item" type="button" role="menuitem" (click)="openMoveFile()">
+      <span class="context-menu-icon">↗</span>
+      Mover para
+    </button>
+    } @else {
+    <button class="context-menu-item" type="button" role="menuitem" (click)="openContextFolder()">
+      <span class="context-menu-icon">›</span>
+      Abrir
+    </button>
+    }
+    <button class="context-menu-item" type="button" role="menuitem" (click)="renameContextItem()">
+      <span class="context-menu-icon">✎</span>
+      Renomear
+    </button>
+    <button
+      class="context-menu-item danger"
+      type="button"
+      role="menuitem"
+      (click)="deleteContextItem()"
+    >
+      <span class="context-menu-icon">×</span>
+      Excluir
+    </button>
+    }
+  </div>
+  } }
+</main>

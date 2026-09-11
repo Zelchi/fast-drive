@@ -1,0 +1,71 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.5.13/schema.json",
+    "files": {
+        "includes": [
+            "**/*.{cjs,css,html,js,json,jsonc,mjs,scss,ts,tsx}",
+            "!**/node_modules",
+            "!**/dist",
+            "!**/out-tsc",
+            "!**/.angular",
+            "!**/coverage",
+            "!**/target",
+            "!backend/drizzle/meta"
+        ],
+        "ignoreUnknown": true
+    },
+    "formatter": {
+        "enabled": true,
+        "formatWithErrors": false,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineEnding": "lf",
+        "lineWidth": 100,
+        "useEditorconfig": true
+    },
+    "javascript": {
+        "parser": {
+            "unsafeParameterDecoratorsEnabled": true
+        },
+        "formatter": {
+            "quoteStyle": "single",
+            "semicolons": "always",
+            "trailingCommas": "all"
+        }
+    },
+    "css": {
+        "formatter": {
+            "enabled": true,
+            "indentStyle": "space",
+            "indentWidth": 2,
+            "lineWidth": 100
+        }
+    },
+    "html": {
+        "formatter": {
+            "enabled": true,
+            "indentStyle": "space",
+            "indentWidth": 2,
+            "lineWidth": 100
+        }
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "preset": "recommended",
+            "correctness": {
+                "noUnusedFunctionParameters": "off"
+            },
+            "style": {
+                "useImportType": "off"
+            }
+        }
+    },
+    "assist": {
+        "enabled": true,
+        "actions": {
+            "source": {
+                "organizeImports": "on"
+            }
+        }
+    }
+}

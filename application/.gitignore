@@ -1,0 +1,5 @@
+# Tauri build output
+src-tauri/target
+
+# Local signing material. Never commit the updater private key.
+.tauri

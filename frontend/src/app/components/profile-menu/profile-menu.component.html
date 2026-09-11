@@ -1,0 +1,144 @@
+<div class="profile-menu-host">
+  <button
+    class="profile-trigger"
+    type="button"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="menuOpen"
+    (click)="toggleMenu()"
+  >
+    <span class="profile-avatar profile-avatar--small">
+      @if (currentUser?.avatarUrl) {
+      <img [src]="currentUser?.avatarUrl" alt="">
+      } @else {
+      <span>{{ profileInitial }}</span>
+      }
+    </span>
+    <span class="profile-trigger-copy">
+      <strong>{{ profileName }}</strong>
+      <small>@{{ currentUser?.nick }}</small>
+    </span>
+    <svg class="profile-chevron" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m7 10 5 5 5-5"></path>
+    </svg>
+  </button>
+
+  @if (menuOpen) {
+  <section
+    class="profile-menu"
+    role="dialog"
+    aria-label="Menu do perfil"
+    (pointerdown)="$event.stopPropagation()"
+  >
+    <div class="profile-menu-heading">
+      <div>
+        <p class="profile-eyebrow">CONTA</p>
+        <h2>Meu perfil</h2>
+      </div>
+      <button class="profile-close" type="button" aria-label="Fechar menu" (click)="closeMenu()">
+        ×
+      </button>
+    </div>
+
+    <div class="profile-summary">
+      <label class="profile-avatar-editor" [class.is-loading]="savingAvatar">
+        <span class="profile-avatar profile-avatar--large">
+          @if (currentUser?.avatarUrl) {
+          <img [src]="currentUser?.avatarUrl" alt="Imagem do perfil">
+          } @else {
+          <span>{{ profileInitial }}</span>
+          }
+        </span>
+        <span class="profile-avatar-overlay">{{ savingAvatar ? '...' : 'Trocar' }}</span>
+        <input
+          type="file"
+          accept="image/*"
+          [disabled]="savingAvatar"
+          (change)="selectAvatar($event)"
+        >
+      </label>
+      <div class="profile-summary-copy">
+        <strong>{{ profileName }}</strong>
+        <small>@{{ currentUser?.nick }}</small>
+        <span>Imagem quadrada de até 8 MB</span>
+      </div>
+      @if (currentUser?.avatarUrl) {
+      <button
+        class="profile-remove-avatar"
+        type="button"
+        [disabled]="savingAvatar"
+        (click)="removeAvatar()"
+      >
+        Remover
+      </button>
+      }
+    </div>
+
+    <form class="profile-form" (ngSubmit)="saveProfile()">
+      <label>
+        Nome do perfil
+        <input
+          name="displayName"
+          [(ngModel)]="displayName"
+          autocomplete="name"
+          maxlength="64"
+          placeholder="Como você quer ser chamado?"
+          [disabled]="savingProfile"
+          required
+        >
+      </label>
+      <p class="profile-help">
+        Seu nick de acesso é <strong>@{{ currentUser?.nick }}</strong> e não será alterado.
+      </p>
+
+      <div class="profile-section-label">ALTERAR SENHA</div>
+      <label>
+        Senha atual
+        <input
+          name="currentPassword"
+          [(ngModel)]="currentPassword"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Digite sua senha atual"
+          [disabled]="savingProfile"
+        >
+      </label>
+      <label>
+        Nova senha
+        <input
+          name="newPassword"
+          [(ngModel)]="newPassword"
+          type="password"
+          autocomplete="new-password"
+          minlength="8"
+          placeholder="Mínimo de 8 caracteres"
+          [disabled]="savingProfile"
+        >
+      </label>
+      <label>
+        Confirmar nova senha
+        <input
+          name="passwordConfirmation"
+          [(ngModel)]="passwordConfirmation"
+          type="password"
+          autocomplete="new-password"
+          minlength="8"
+          placeholder="Repita a nova senha"
+          [disabled]="savingProfile"
+        >
+      </label>
+
+      @if (profileError) {
+      <p class="profile-feedback profile-feedback--error" role="alert">{{ profileError }}</p>
+      } @if (profileNotice) {
+      <p class="profile-feedback" role="status">{{ profileNotice }}</p>
+      }
+
+      <button class="profile-save" type="submit" [disabled]="savingProfile || savingAvatar">
+        {{ savingProfile ? 'Salvando...' : 'Salvar alterações' }}
+      </button>
+    </form>
+
+    <button class="profile-logout" type="button" (click)="logout()">Sair da conta</button>
+  </section>
+  }
+</div>

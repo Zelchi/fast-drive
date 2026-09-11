@@ -1,0 +1,440 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.public-share-page {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 1080px);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 1.5rem clamp(1.25rem, 5vw, 4rem) 2rem;
+  justify-content: center;
+  overflow-anchor: none;
+  color: #d0d0d0;
+}
+
+@supports (justify-content: safe center) {
+  .public-share-page {
+    justify-content: safe center;
+  }
+}
+
+.public-share-eyebrow {
+  margin: 0;
+  color: #777;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.public-share-card,
+.public-share-state {
+  width: min(100%, 780px);
+  margin: 0 auto;
+}
+
+.public-share-card {
+  border: 1px solid #303030;
+  background: #111;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 28%);
+}
+
+.public-share-card-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+}
+
+.public-share-card-heading h1,
+.public-share-state h1 {
+  max-width: 640px;
+  margin: 0.55rem 0 0;
+  overflow-wrap: anywhere;
+  color: #f2f2f2;
+  font-size: clamp(1.5rem, 4vw, 2.7rem);
+  letter-spacing: -0.06em;
+  line-height: 1;
+}
+
+.public-share-file-meta {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 0.25rem;
+  color: #777;
+  font-size: 0.68rem;
+  text-align: right;
+}
+
+.public-share-preview {
+  display: grid;
+  min-height: 230px;
+  border-top: 1px solid #292929;
+  border-bottom: 1px solid #292929;
+  background: #090909;
+}
+
+.public-share-preview.preview-media {
+  min-height: 300px;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 2.25rem);
+}
+
+.public-share-preview img,
+.public-share-preview video {
+  display: block;
+  width: 100%;
+  max-height: min(62vh, 620px);
+  object-fit: contain;
+}
+
+.public-share-preview video {
+  background: #000;
+}
+
+.public-share-preview audio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.public-share-audio-player {
+  width: min(100%, 620px);
+  padding: 1rem;
+  border: 1px solid #303030;
+  background: #111;
+}
+
+.public-share-audio-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  color: #777;
+  font-size: 0.64rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+}
+
+.public-share-audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.public-share-audio-button {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid #454545;
+  color: #ddd;
+  background: #191919;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease,
+    background 140ms ease;
+}
+
+.public-share-audio-button:hover {
+  border-color: #aaa;
+  color: #fff;
+  background: #242424;
+}
+
+.public-share-audio-play-button {
+  width: 2.7rem;
+  height: 2.7rem;
+  border-color: #f2f2f2;
+  color: #0a0a0a;
+  background: #f2f2f2;
+}
+
+.public-share-audio-play-button:hover {
+  border-color: #fff;
+  color: #0a0a0a;
+  background: #d2d2d2;
+}
+
+.public-share-audio-button svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.public-share-audio-slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 1.5rem;
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+.public-share-audio-slider:focus-visible {
+  outline: 1px solid #aaa;
+  outline-offset: 4px;
+}
+
+.public-share-audio-slider:focus-within {
+  outline: 1px solid #aaa;
+  outline-offset: 4px;
+}
+
+.public-share-audio-slider.is-disabled {
+  cursor: wait;
+  opacity: 0.45;
+}
+
+.public-share-audio-progress {
+  flex: 1 1 auto;
+  min-width: 120px;
+}
+
+.public-share-audio-progress::before {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: #393939;
+  content: "";
+  transform: translateY(-50%);
+}
+
+.public-share-audio-progress-fill {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 0;
+  height: 2px;
+  background: #ddd;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.public-share-audio-progress::after,
+.public-share-audio-volume::after {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: var(--slider-position);
+  width: 11px;
+  height: 11px;
+  content: "";
+  border-radius: 50%;
+  background: #f2f2f2;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.public-share-audio-volume {
+  position: relative;
+  flex: 0 1 92px;
+  min-width: 70px;
+}
+
+.public-share-audio-volume-track,
+.public-share-audio-volume-fill {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+.public-share-audio-volume-track {
+  background: #393939;
+}
+
+.public-share-audio-volume-fill {
+  background: #ddd;
+  pointer-events: none;
+}
+
+.public-share-audio-error {
+  margin: 0.85rem 0 0;
+  color: #aaa;
+  font-size: 0.72rem;
+}
+
+.public-share-preview iframe {
+  display: block;
+  width: 100%;
+  height: min(68vh, 680px);
+  border: 0;
+  background: #f2f2f2;
+}
+
+.public-share-markdown {
+  width: 100%;
+  min-height: 300px;
+  margin: 0;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  color: #c8c8c8;
+  background: #0b0b0b;
+  font:
+    0.82rem / 1.65 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.public-share-inline-state {
+  display: grid;
+  min-height: 300px;
+  place-items: center;
+  padding: 2rem;
+  color: #888;
+  text-align: center;
+}
+
+.public-share-file-placeholder {
+  display: grid;
+  place-items: center;
+  gap: 0.55rem;
+  align-content: center;
+  min-height: 230px;
+  padding: 2rem;
+  color: #777;
+  text-align: center;
+}
+
+.public-share-file-placeholder strong {
+  color: #c8c8c8;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.public-share-file-placeholder span:last-child {
+  font-size: 0.75rem;
+}
+
+.public-share-file-icon,
+.public-share-state-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #555;
+  color: #ddd;
+  background: #171717;
+  font-size: 1.2rem;
+}
+
+.public-share-download-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem clamp(1.25rem, 4vw, 2rem);
+}
+
+.public-share-download-button,
+.public-share-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.72rem 0.9rem;
+  border: 1px solid #f2f2f2;
+  border-radius: 2px;
+  color: #0a0a0a;
+  background: #f2f2f2;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+}
+
+.public-share-download-button:hover,
+.public-share-secondary-button:hover {
+  color: #0a0a0a;
+  background: #d2d2d2;
+}
+
+.public-share-download-icon {
+  font-size: 1rem;
+  line-height: 0.8;
+}
+
+.public-share-state {
+  display: grid;
+  justify-items: start;
+  max-width: 560px;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  border-left: 2px solid #aaa;
+  background: #111;
+}
+
+.public-share-state h1 {
+  font-size: clamp(1.8rem, 5vw, 3.4rem);
+}
+.public-share-state p:not(.public-share-eyebrow) {
+  max-width: 430px;
+  margin: 1rem 0 0;
+  color: #888;
+  line-height: 1.55;
+}
+.public-share-loader {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 1.5rem;
+  border: 2px solid #363636;
+  border-top-color: #ddd;
+  border-radius: 50%;
+  animation: public-share-spin 800ms linear infinite;
+}
+.public-share-state-icon {
+  margin-bottom: 1.5rem;
+  color: #aaa;
+  font-size: 1.5rem;
+}
+.public-share-secondary-button {
+  margin-top: 1.5rem;
+  color: #ddd;
+  border-color: #444;
+  background: transparent;
+}
+.public-share-secondary-button:hover {
+  color: #fff;
+  border-color: #aaa;
+  background: #1c1c1c;
+}
+@keyframes public-share-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .public-share-card-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+  .public-share-file-meta {
+    text-align: left;
+  }
+}

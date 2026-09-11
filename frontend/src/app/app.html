@@ -1,0 +1,34 @@
+<div
+  #appScrollViewport
+  id="app-scroll-viewport"
+  class="app-scroll-viewport"
+  (scroll)="syncAppScrollbar()"
+  (wheel)="onAppWheel($event)"
+>
+  <router-outlet
+    (activate)="scheduleAppScrollbarSync()"
+    (deactivate)="scheduleAppScrollbarSync()"
+  ></router-outlet>
+</div>
+@if (appScrollbarVisible) {
+<div
+  class="app-scrollbar-track"
+  role="scrollbar"
+  tabindex="0"
+  aria-controls="app-scroll-viewport"
+  aria-label="Rolagem da página"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  aria-valuenow="0"
+  (click)="onAppScrollbarTrackClick($event)"
+  (keydown)="onAppScrollbarKeydown($event)"
+>
+  <div
+    class="app-scrollbar-thumb"
+    [style.height.px]="appScrollbarThumbHeight"
+    [style.transform]="'translateY(' + appScrollbarThumbOffset + 'px)'"
+    (mousedown)="startAppScrollbarDrag($event)"
+  ></div>
+</div>
+}
+<app-modal />

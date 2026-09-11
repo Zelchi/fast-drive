@@ -1,0 +1,9 @@
+{
+    "default": {
+        "identifier": "default",
+        "description": "Permissões da janela principal do Fast Drive",
+        "local": true,
+        "windows": ["main"],
+        "permissions": ["core:default", "updater:default"]
+    }
+}

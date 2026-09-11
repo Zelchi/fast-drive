@@ -1,0 +1,161 @@
+<main class="admin-shell">
+  <header class="topbar">
+    <a class="brand" href="/drive" routerLink="/drive"><span>FD</span> Fast Drive</a>
+    <div class="topbar-actions">
+      <app-profile-menu />
+      <a class="ghost-button" href="/drive" routerLink="/drive">Voltar ao drive</a>
+    </div>
+  </header>
+
+  <div class="admin-content">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">ADMINISTRAÇÃO</p>
+        <h1>Usuários</h1>
+        <p class="intro">Crie acessos e controle os seriais da instalação.</p>
+      </div>
+    </div>
+
+    @if (error) {
+    <p class="form-error" role="alert">{{ error }}</p>
+    } @if (notice) {
+    <p class="form-notice" role="status">{{ notice }}</p>
+    } @if (revealedSerial) {
+    <section class="serial-card">
+      <div>
+        <p class="eyebrow">SERIAL GERADO</p>
+        <p class="serial-help">
+          Copie e entregue este serial ao usuário. Ele não será exibido novamente.
+        </p>
+      </div>
+      <code>{{ revealedSerial }}</code>
+      <button class="ghost-button" type="button" (click)="copySerial()">Copiar</button>
+    </section>
+    }
+
+    <section class="panel create-panel">
+      <div>
+        <p class="eyebrow">NOVO ACESSO</p>
+        <h2>Criar usuário</h2>
+      </div>
+      <form class="create-form" (ngSubmit)="createUser()">
+        <label>
+          <span>Nick</span>
+          <input
+            name="newNick"
+            [(ngModel)]="newNick"
+            autocomplete="off"
+            maxlength="32"
+            placeholder="ex.: maria.silva"
+          >
+        </label>
+        <button class="primary-button" type="submit" [disabled]="saving">Criar usuário</button>
+      </form>
+    </section>
+
+    <section class="panel users-panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">ACESSOS</p>
+          <h2>Usuários cadastrados</h2>
+        </div>
+        <span class="item-count">{{ users.length }} usuários</span>
+      </div>
+
+      @if (loading) {
+      <div class="empty-state">Carregando usuários...</div>
+      } @else if (!users.length) {
+      <div class="empty-state">Nenhum usuário cadastrado.</div>
+      } @else {
+      <div class="user-list">
+        <div class="list-header">
+          <span>Usuário</span><span>Status</span><span>Última atualização</span><span></span>
+        </div>
+        <div class="user-row" *ngFor="let user of users">
+          <div class="user-name">
+            <strong>{{ user.nick }}</strong>
+            <small
+              >{{ user.id === authService.user()?.id ? 'Você' : 'Acesso compartilhado' }}</small
+            >
+          </div>
+          <div class="status-cell">
+            <span class="status" [class.inactive]="!user.isActive"
+              >{{ user.isActive ? 'Ativo' : 'Inativo' }}</span
+            >
+            <small>{{ serialStatus(user) }}</small>
+          </div>
+          <span class="updated-at">{{ formatDate(user.updatedAt) }}</span>
+          <div class="row-actions">
+            <button
+              class="action-button action-button--toggle"
+              [class.is-inactive]="!user.isActive"
+              [class.is-protected]="isOwnerUser(user)"
+              type="button"
+              [title]="
+                  isOwnerUser(user)
+                    ? 'Owner protegido'
+                    : user.isActive
+                      ? 'Desativar usuário'
+                      : 'Ativar usuário'
+                "
+              [attr.aria-label]="
+                  isOwnerUser(user)
+                    ? 'Desativar usuário indisponível: owner protegido'
+                    : user.isActive
+                      ? 'Desativar usuário'
+                      : 'Ativar usuário'
+                "
+              (click)="toggleUser(user)"
+              [disabled]="saving || isOwnerUser(user)"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v9"></path>
+                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+              </svg>
+            </button>
+            <button
+              class="action-button action-button--serial"
+              [class.is-protected]="isOwnerUser(user)"
+              type="button"
+              [title]="isOwnerUser(user) ? 'Owner protegido' : 'Gerar novo serial'"
+              [attr.aria-label]="
+                  isOwnerUser(user)
+                    ? 'Gerar novo serial indisponível: owner protegido'
+                    : 'Gerar novo serial'
+                "
+              (click)="rotateSerial(user)"
+              [disabled]="saving || isOwnerUser(user)"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 11a8.1 8.1 0 0 0-14.9-4L3 10"></path>
+                <path d="M3 5v5h5"></path>
+                <path d="M4 13a8.1 8.1 0 0 0 14.9 4L21 14"></path>
+                <path d="M21 19v-5h-5"></path>
+              </svg>
+            </button>
+            <button
+              class="action-button action-button--danger"
+              [class.is-protected]="isOwnerUser(user)"
+              type="button"
+              [title]="isOwnerUser(user) ? 'Owner protegido' : 'Revogar serial'"
+              [attr.aria-label]="
+                  isOwnerUser(user)
+                    ? 'Revogar serial indisponível: owner protegido'
+                    : 'Revogar serial'
+                "
+              (click)="revokeSerial(user)"
+              [disabled]="saving || isOwnerUser(user)"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="m9 9 6 6"></path>
+                <path d="m15 9-6 6"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </section>
+  </div>
+</main>

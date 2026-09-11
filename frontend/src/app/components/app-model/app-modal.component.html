@@ -1,0 +1,62 @@
+@if (modalService.state(); as modal) {
+<div class="modal-backdrop" role="presentation" (pointerdown)="onBackdropPointerDown($event)">
+  <section
+    class="modal-dialog"
+    [class]="'modal-dialog variant-' + modal.variant"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="app-modal-title"
+  >
+    <button class="close-button" type="button" aria-label="Fechar" (click)="cancel()">×</button>
+
+    <p class="eyebrow">{{ modal.variant === 'warning' ? 'ATENÇÃO' : 'FAST DRIVE' }}</p>
+    <h2 id="app-modal-title">{{ modal.title }}</h2>
+    @if (modal.message) {
+    <p class="modal-message">{{ modal.message }}</p>
+    } @if (modal.input; as input) {
+    <label class="modal-input-label" [class.range-input]="input.type === 'range'">
+      @if (input.type === 'range') {
+      <span class="modal-input-heading">
+        <span>{{ input.label || 'Valor' }}</span>
+        <strong>{{ inputValue }}{{ input.suffix || '' }}</strong>
+      </span>
+      } @else {
+      <span>{{ input.label || 'Valor' }}</span>
+      }
+      <div
+        class="modal-input-control"
+        [class.range-control]="input.type === 'range'"
+        [class.has-suffix]="input.type !== 'range' && !!input.suffix"
+      >
+        <input
+          [type]="input.type || 'text'"
+          [min]="input.min ?? null"
+          [max]="input.max ?? null"
+          [step]="input.step ?? null"
+          [value]="inputValue"
+          [placeholder]="input.placeholder || ''"
+          (input)="inputValue = $any($event.target).value"
+          (keydown.enter)="submit()"
+        >
+        @if (input.type !== 'range' && input.suffix) {
+        <span class="modal-input-suffix">{{ input.suffix }}</span>
+        }
+      </div>
+    </label>
+    @if (inputError) {
+    <p class="input-error" role="alert">{{ inputError }}</p>
+    } }
+
+    <div class="modal-actions">
+      @if (modal.showCancel) {
+      <button class="secondary-button" type="button" (click)="cancel()">
+        {{ modal.cancelLabel }}
+      </button>
+      }
+      <button class="primary-button" type="button" (click)="submit()">
+        {{ modal.confirmLabel }}
+      </button>
+    </div>
+  </section>
+</div>
+}

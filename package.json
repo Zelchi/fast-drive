@@ -1,0 +1,31 @@
+{
+    "name": "fast-drive",
+    "version": "0.0.0",
+    "private": true,
+    "packageManager": "yarn@1.22.22",
+    "workspaces": [
+        "application",
+        "backend",
+        "frontend",
+        "package/*"
+    ],
+    "scripts": {
+        "build:packages": "yarn workspace @fast-drive/auth build && yarn workspace @fast-drive/file-models build && yarn workspace @fast-drive/shared-types build",
+        "build": "yarn build:packages && yarn --cwd backend build && yarn --cwd frontend build",
+        "dev:packages": "concurrently -k -n auth,file-models,shared-types \"yarn workspace @fast-drive/auth dev\" \"yarn workspace @fast-drive/file-models dev\" \"yarn workspace @fast-drive/shared-types dev\"",
+        "dev": "yarn build:packages && concurrently -k -n packages,backend,frontend \"yarn dev:packages\" \"yarn --cwd backend start:dev\" \"yarn --cwd frontend start\"",
+        "desktop:dev": "yarn --cwd application dev",
+        "desktop:build": "yarn --cwd application build",
+        "format": "biome format --write .",
+        "format:check": "biome format .",
+        "lint": "biome lint .",
+        "biome:check": "biome check .",
+        "biome:check:write": "biome check --write .",
+        "test": "yarn build:packages && yarn --cwd backend test && yarn --cwd frontend test --watch=false"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^2.5.13",
+        "concurrently": "^9.2.1",
+        "tsup": "^8.5.0"
+    }
+}

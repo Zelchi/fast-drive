@@ -1,0 +1,162 @@
+<main class="public-share-page">
+  @if (loading) {
+  <section class="public-share-state" aria-live="polite">
+    <div class="public-share-loader" aria-hidden="true"></div>
+    <p class="public-share-eyebrow">AGUARDE</p>
+    <h1>Preparando o arquivo</h1>
+    <p>Estamos verificando este link de compartilhamento.</p>
+  </section>
+  } @else if (error) {
+  <section class="public-share-state public-share-error-state" role="alert">
+    <div class="public-share-state-icon" aria-hidden="true">×</div>
+    <p class="public-share-eyebrow">LINK INDISPONÍVEL</p>
+    <h1>Não foi possível abrir este arquivo</h1>
+    <p>{{ error }}</p>
+    <button class="public-share-secondary-button" type="button" (click)="retry()">
+      Tentar novamente
+    </button>
+  </section>
+  } @else if (share) {
+  <section class="public-share-card">
+    <div class="public-share-card-heading">
+      <div>
+        <p class="public-share-eyebrow">{{ mediaLabel }}</p>
+        <h1>{{ share.originalName }}</h1>
+      </div>
+      <div class="public-share-file-meta">
+        <span>{{ share.mimeType }}</span>
+        <span>{{ formatBytes(share.size) }}</span>
+      </div>
+    </div>
+
+    <div
+      class="public-share-preview"
+      [class.preview-media]="isImage || isVideo || isAudio || isPdf || isMarkdown"
+    >
+      @if (isImage) {
+      <img [src]="previewUrl" alt="Prévia do arquivo compartilhado" draggable="false">
+      } @else if (isVideo) {
+      <!-- biome-ignore lint/a11y/useMediaCaption: The shared file does not provide a caption track. -->
+      <video
+        [src]="previewUrl"
+        controls
+        playsinline
+        preload="metadata"
+        aria-label="Prévia do vídeo"
+      >
+        Seu navegador não consegue reproduzir este vídeo.
+      </video>
+      } @else if (isAudio) {
+      <!-- biome-ignore lint/a11y/useMediaCaption: The shared audio file does not provide a caption track. -->
+      <audio
+        #audioElement
+        class="public-share-audio-element"
+        [src]="previewUrl"
+        preload="metadata"
+        aria-label="Áudio compartilhado"
+        (loadedmetadata)="onAudioMetadata(audioElement)"
+        (durationchange)="onAudioDurationChange(audioElement)"
+        (loadeddata)="onAudioDurationChange(audioElement)"
+        (canplay)="onAudioDurationChange(audioElement)"
+        (timeupdate)="onAudioTimeUpdate(audioElement)"
+        (play)="onAudioPlay()"
+        (pause)="onAudioPause()"
+        (ended)="onAudioEnded()"
+        (error)="audioError = 'Não foi possível carregar este áudio.'"
+      >
+        Seu navegador não consegue reproduzir este áudio.
+      </audio>
+      <div class="public-share-audio-player">
+        <div class="public-share-audio-topline">
+          <span>ÁUDIO</span>
+          <span
+            >{{ formatAudioTime(audioCurrentTime) }} / {{ formatAudioTime(audioDuration) }}</span
+          >
+        </div>
+        <div class="public-share-audio-controls">
+          <button
+            class="public-share-audio-button public-share-audio-play-button"
+            type="button"
+            [attr.aria-label]="audioPlaying ? 'Pausar áudio' : 'Reproduzir áudio'"
+            (click)="toggleAudio(audioElement)"
+          >
+            @if (audioPlaying) {
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" /></svg>
+            } @else {
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 10 7-10 7Z" /></svg>
+            }
+          </button>
+
+          <div
+            class="public-share-audio-slider public-share-audio-progress"
+            [class.is-disabled]="audioDuration <= 0"
+            role="slider"
+            tabindex="0"
+            aria-label="Progresso do áudio"
+            aria-valuemin="0"
+            aria-valuemax="0"
+            [attr.aria-valuemax]="audioDuration"
+            aria-valuenow="0"
+            [attr.aria-valuenow]="audioCurrentTime"
+            aria-valuetext="{{ formatAudioTime(audioCurrentTime) }}"
+            (pointerdown)="beginAudioSeek(audioElement, $event)"
+            (pointermove)="moveAudioSeek(audioElement, $event)"
+            (pointerup)="endAudioSeek($event)"
+            (pointercancel)="endAudioSeek($event)"
+            (keydown)="onAudioSeekKeydown(audioElement, $event)"
+            [style.--slider-position]="audioProgress + '%'"
+          >
+            <div class="public-share-audio-progress-fill" [style.width.%]="audioProgress"></div>
+          </div>
+
+          <div
+            class="public-share-audio-slider public-share-audio-volume"
+            role="slider"
+            tabindex="0"
+            aria-label="Volume do áudio"
+            aria-valuemin="0"
+            aria-valuemax="1"
+            aria-valuenow="0"
+            [attr.aria-valuenow]="audioVolume"
+            aria-valuetext="{{ audioVolumeLabel }}"
+            (pointerdown)="beginAudioVolume(audioElement, $event)"
+            (pointermove)="moveAudioVolume(audioElement, $event)"
+            (pointerup)="endAudioVolume($event)"
+            (pointercancel)="endAudioVolume($event)"
+            (keydown)="onAudioVolumeKeydown(audioElement, $event)"
+            [style.--slider-position]="audioVolume * 100 + '%'"
+          >
+            <div class="public-share-audio-volume-track"></div>
+            <div class="public-share-audio-volume-fill" [style.width.%]="audioVolume * 100"></div>
+          </div>
+        </div>
+        @if (audioError) {
+        <p class="public-share-audio-error" role="alert">{{ audioError }}</p>
+        }
+      </div>
+      } @else if (isPdf) {
+      <iframe [src]="pdfPreviewUrl" title="Prévia do PDF"></iframe>
+      } @else if (isMarkdown) { @if (markdownLoading) {
+      <div class="public-share-inline-state" aria-live="polite">Carregando prévia…</div>
+      } @else if (markdownError) {
+      <div class="public-share-inline-state" role="alert">{{ markdownError }}</div>
+      } @else {
+      <pre class="public-share-markdown">{{ markdownContent }}</pre>
+      } } @else {
+      <div class="public-share-file-placeholder">
+        <span class="public-share-file-icon" aria-hidden="true">↓</span>
+        <strong>Prévia não disponível</strong>
+        <span>Baixe o arquivo para abri-lo no dispositivo.</span>
+      </div>
+      }
+    </div>
+
+    <div class="public-share-download-row">
+      <a class="public-share-download-button" href="/" [href]="downloadUrl" download>
+        <span class="public-share-download-icon" aria-hidden="true">↓</span>
+        <span>Baixar arquivo</span>
+      </a>
+    </div>
+  </section>
+  }
+</main>

@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.tauri.app/config/2",
+    "productName": "Fast Drive",
+    "version": "0.1.0",
+    "identifier": "com.fastdrive.desktop",
+    "build": {
+        "beforeDevCommand": "yarn --cwd .. dev",
+        "beforeBuildCommand": "yarn --cwd .. build:packages && yarn --cwd ../frontend build",
+        "devUrl": "http://127.0.0.1:7123",
+        "frontendDist": "../../frontend/dist/frontend/browser"
+    },
+    "app": {
+        "security": {
+            "csp": null
+        },
+        "windows": [
+            {
+                "label": "main",
+                "title": "Fast Drive",
+                "width": 1280,
+                "height": 800,
+                "minWidth": 960,
+                "minHeight": 600,
+                "resizable": true,
+                "fullscreen": false
+            }
+        ]
+    },
+    "bundle": {
+        "active": true,
+        "targets": "all",
+        "category": "Utility",
+        "shortDescription": "Gerenciador de arquivos Fast Drive",
+        "longDescription": "Aplicativo desktop para gerenciar arquivos e workspaces do Fast Drive.",
+        "icon": [
+            "icons/32x32.png",
+            "icons/128x128.png",
+            "icons/128x128@2x.png",
+            "icons/icon.icns",
+            "icons/icon.ico"
+        ],
+        "createUpdaterArtifacts": true
+    },
+    "plugins": {
+        "updater": {
+            "active": true,
+            "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEI4QjVDRTBBMkI3NURBN0UKUldSKzJuVXJDczYxdU04RDhOeEE3STBLem5rZVB2UmpzVVlrUnd2UDBya3hCUFE3cTNRZzNrOU4K",
+            "endpoints": [
+                "https://github.com/OWNER/REPOSITORY/releases/latest/download/latest.json"
+            ],
+            "windows": {
+                "installMode": "passive"
+            }
+        }
+    }
+}

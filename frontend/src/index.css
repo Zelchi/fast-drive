@@ -1,0 +1,386 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, sans-serif;
+  background: #0a0a0a;
+  color: #f2f2f2;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+input,
+select,
+textarea,
+[contenteditable="true"] {
+  user-select: text;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+.share-button {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid #3a3a3a;
+  border-radius: 2px;
+  color: #aaa;
+  background: transparent;
+  cursor: pointer;
+}
+
+.share-button svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.share-button:hover {
+  border-color: #aaa;
+  color: #f2f2f2;
+  background: #1a1a1a;
+}
+
+.share-modal-backdrop {
+  position: fixed;
+  z-index: 900;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 78%);
+}
+
+.share-modal {
+  width: min(100%, 540px);
+  padding: 1.25rem;
+  border: 1px solid #4a4a4a;
+  border-left: 3px solid #aaa;
+  border-radius: 2px;
+  color: #d0d0d0;
+  background: #111;
+  box-shadow: 0 18px 60px rgb(0 0 0 / 45%);
+}
+
+.share-modal-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.share-modal-heading .eyebrow {
+  margin-bottom: 0.4rem;
+}
+
+.share-modal-heading h2 {
+  margin: 0;
+  color: #eee;
+  font-size: 1rem;
+  letter-spacing: -0.03em;
+}
+
+.share-file-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 1.25rem 0;
+  padding: 0.75rem;
+  border: 1px solid #292929;
+  background: #0c0c0c;
+}
+
+.share-file-summary > div {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.share-file-summary strong {
+  overflow: hidden;
+  color: #eee;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.share-file-summary small,
+.share-access-copy small,
+.share-link-box small {
+  color: #666;
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.share-status {
+  margin: 0;
+  color: #888;
+  font-size: 0.78rem;
+}
+
+.share-status-error {
+  color: #bdbdbd;
+}
+
+.share-access-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid #292929;
+  border-bottom: 1px solid #292929;
+}
+
+.share-access-copy {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.share-label {
+  color: #777;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.share-access-copy strong {
+  color: #eee;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.share-toggle {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 24px;
+  padding: 3px;
+  border: 1px solid #4a4a4a;
+  border-radius: 2px;
+  background: #1b1b1b;
+  cursor: pointer;
+}
+
+.share-toggle span {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: #777;
+  transition:
+    transform 140ms ease,
+    background 140ms ease;
+}
+
+.share-toggle.is-public {
+  border-color: #aaa;
+  background: #aaa;
+}
+
+.share-toggle:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.share-link-box {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.share-link-box label {
+  color: #888;
+  font-size: 0.7rem;
+}
+
+.share-link-control {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.share-link-control input {
+  min-width: 0;
+  flex: 1;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid #303030;
+  border-radius: 2px;
+  outline: 0;
+  color: #bbb;
+  background: #0a0a0a;
+  font: inherit;
+  font-size: 0.72rem;
+}
+
+.share-link-control input:focus {
+  border-color: #aaa;
+}
+
+.share-link-control .ghost-button {
+  flex: 0 0 auto;
+}
+
+.share-private-note {
+  margin: 1rem 0 0;
+  color: #777;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.upload-progress {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1.25rem;
+  padding: 0.75rem;
+  border: 1px solid #292929;
+  background: #101010;
+}
+
+.upload-progress-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #888;
+  font-size: 0.7rem;
+}
+
+.upload-progress-heading span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upload-progress-heading strong {
+  flex: 0 0 auto;
+  color: #eee;
+  font-weight: 600;
+}
+
+.upload-progress-track {
+  height: 4px;
+  overflow: hidden;
+  background: #2a2a2a;
+}
+
+.upload-progress-track span {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  background: #aaa;
+  transition: width 120ms ease;
+}
+
+.share-toggle.is-public span {
+  background: #111;
+  transform: translateX(17px);
+}
+
+.move-modal {
+  border-left-color: #aaa;
+}
+
+.move-folder-field {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  color: #888;
+  font-size: 0.72rem;
+}
+
+.move-folder-field select {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #303030;
+  border-radius: 2px;
+  outline: 0;
+  color: #eee;
+  background: #0a0a0a;
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.move-folder-field select:focus {
+  border-color: #aaa;
+}
+
+.move-folder-field select:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.move-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.move-modal-actions button {
+  padding: 0.7rem 0.9rem;
+  border-radius: 2px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.76rem;
+}
+
+.move-modal-actions .primary-button {
+  border: 1px solid #f2f2f2;
+  color: #0a0a0a;
+  background: #f2f2f2;
+  font-weight: 700;
+}
+
+.move-modal-actions .primary-button:hover {
+  background: #d2d2d2;
+}
+
+.move-modal-actions .primary-button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.move-modal-actions .secondary-button {
+  border: 1px solid #3a3a3a;
+  color: #aaa;
+  background: transparent;
+}
+
+.move-modal-actions .secondary-button:hover {
+  border-color: #aaa;
+  color: #f2f2f2;
+}
+
+@media (max-width: 800px) {
+  .share-link-control {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .share-link-control .ghost-button {
+    width: 100%;
+  }
+
+  .upload-progress {
+    margin-top: 1rem;
+  }
+}

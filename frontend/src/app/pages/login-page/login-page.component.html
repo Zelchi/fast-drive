@@ -1,0 +1,69 @@
+<main class="auth-layout">
+  <section class="auth-intro">
+    <div class="brand-mark">FD</div>
+    <p class="eyebrow">FAST DRIVE</p>
+    <h1>Seus arquivos, no seu espaço.</h1>
+    <p class="intro-copy">Um drive simples, privado e persistente para a sua instalação.</p>
+  </section>
+
+  <section class="auth-card">
+    <div class="card-heading">
+      <p class="eyebrow">ACESSO</p>
+      <h2>{{ firstAccessDetected ? 'Ative sua conta' : 'Bem-vindo de volta' }}</h2>
+      <p>
+        {{ firstAccessDetected ? 'O servidor identificou um primeiro acesso. Crie uma senha para
+        continuar.' : 'Informe seu nick e sua senha ou serial.' }}
+      </p>
+    </div>
+
+    <form (ngSubmit)="submit()">
+      <label>
+        Nick
+        <input
+          name="nick"
+          [(ngModel)]="nick"
+          (ngModelChange)="nickChanged()"
+          autocomplete="username"
+          placeholder="seu.nick"
+          required
+        >
+      </label>
+
+      <label>
+        Senha ou serial
+        <input
+          name="credential"
+          [(ngModel)]="credential"
+          (ngModelChange)="credentialChanged()"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Digite sua senha ou serial"
+          required
+        >
+      </label>
+
+      @if (firstAccessDetected) {
+      <p class="first-access-note">Primeiro acesso detectado pelo servidor.</p>
+
+      <label>
+        Nova senha
+        <input
+          name="newPassword"
+          [(ngModel)]="newPassword"
+          type="password"
+          autocomplete="new-password"
+          placeholder="Mínimo de 8 caracteres"
+          minlength="8"
+          required
+        >
+      </label>
+      } @if (error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+      }
+
+      <button class="primary-button" type="submit" [disabled]="loading">
+        {{ loading ? 'Aguarde...' : (firstAccessDetected ? 'Criar senha' : 'Entrar') }}
+      </button>
+    </form>
+  </section>
+</main>
