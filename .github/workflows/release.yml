@@ -120,7 +120,7 @@ jobs:
           tagName: desktop-v__VERSION__
           releaseName: Fast Drive v__VERSION__
           releaseBody: "Baixe o instalador correspondente ao seu sistema operacional."
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true
           args: ${{ matrix.args }}
