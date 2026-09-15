@@ -4,8 +4,8 @@
     "version": "0.1.4",
     "identifier": "com.fastdrive.desktop",
     "build": {
-        "beforeDevCommand": "yarn --cwd ../.. dev",
-        "beforeBuildCommand": "yarn --cwd ../.. build:desktop-frontend",
+        "beforeDevCommand": "yarn --cwd .. dev",
+        "beforeBuildCommand": "yarn --cwd .. build:packages && yarn --cwd ../frontend build",
         "devUrl": "http://127.0.0.1:7123",
         "frontendDist": "../../frontend/dist/frontend/browser"
     },

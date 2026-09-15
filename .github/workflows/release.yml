@@ -9,37 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build-desktop-frontend:
-    name: Build desktop frontend
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: yarn
-          cache-dependency-path: yarn.lock
-
-      - name: Install JavaScript dependencies
-        run: yarn install --frozen-lockfile --ignore-engines
-
-      - name: Build frontend assets
-        run: yarn build:desktop-frontend
-
-      - name: Upload frontend assets
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-frontend
-          path: frontend/dist/frontend/browser/**
-          if-no-files-found: error
-          retention-days: 1
-
   publish-tauri:
-    needs: build-desktop-frontend
     strategy:
       fail-fast: false
       matrix:
@@ -94,12 +64,6 @@ jobs:
       - name: Install JavaScript dependencies
         run: yarn install --frozen-lockfile --ignore-engines
 
-      - name: Download prebuilt frontend
-        uses: actions/download-artifact@v4
-        with:
-          name: desktop-frontend
-          path: frontend/dist/frontend/browser
-
       - name: Prepare updater signing key
         shell: bash
         env:
@@ -149,7 +113,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NO_STRIP: "1"
-          FAST_DRIVE_SKIP_FRONTEND_BUILD: "1"
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: software

@@ -11,7 +11,6 @@
     ],
     "scripts": {
         "build:packages": "yarn workspace @fast-drive/auth build && yarn workspace @fast-drive/file-models build && yarn workspace @fast-drive/shared-types build",
-        "build:desktop-frontend": "node scripts/build-desktop-frontend.mjs",
         "build": "yarn build:packages && yarn --cwd backend build && yarn --cwd frontend build",
         "dev:packages": "concurrently -k -n auth,file-models,shared-types \"yarn workspace @fast-drive/auth dev\" \"yarn workspace @fast-drive/file-models dev\" \"yarn workspace @fast-drive/shared-types dev\"",
         "dev": "yarn build:packages && concurrently -k -n packages,backend,frontend \"yarn dev:packages\" \"yarn --cwd backend start:dev\" \"yarn --cwd frontend start\"",
