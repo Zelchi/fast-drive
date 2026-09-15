@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const applicationDirectory = path.dirname(fileURLToPath(import.meta.url));
-const configPath = path.resolve(applicationDirectory, '../src-tauri/tauri.conf.json');
+const softwareDirectory = path.dirname(fileURLToPath(import.meta.url));
+const configPath = path.resolve(softwareDirectory, '../tauri/tauri.conf.json');
 const repository = process.env.GITHUB_REPOSITORY;
 
 if (!repository) {

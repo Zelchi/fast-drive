@@ -3,8 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const applicationDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const localPrivateKeyPath = path.join(applicationDirectory, '.tauri', 'fast-drive.key');
+const softwareDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const localPrivateKeyPath = path.join(softwareDirectory, '.tauri', 'fast-drive.key');
 const environment = { ...process.env };
 
 if (process.platform === 'linux') {
@@ -19,7 +19,7 @@ if (!environment.TAURI_SIGNING_PRIVATE_KEY) {
 }
 
 const tauri = spawn('tauri', ['build', ...process.argv.slice(2)], {
-    cwd: applicationDirectory,
+    cwd: path.join(softwareDirectory, 'tauri'),
     env: environment,
     shell: process.platform === 'win32',
     stdio: 'inherit',

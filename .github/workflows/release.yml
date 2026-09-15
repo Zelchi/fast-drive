@@ -80,8 +80,8 @@ jobs:
             ~/.cargo/registry/cache
             ~/.cargo/git/db
             ~/.cache/tauri
-            application/src-tauri/target
-          key: ${{ runner.os }}-${{ matrix.target }}-cargo-${{ hashFiles('application/src-tauri/Cargo.lock') }}
+            software/tauri/target
+          key: ${{ runner.os }}-${{ matrix.target }}-cargo-${{ hashFiles('software/tauri/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.target }}-cargo-
 
@@ -142,7 +142,7 @@ jobs:
           NODE
 
       - name: Configure updater endpoint
-        run: yarn --cwd application configure-updater
+        run: yarn --cwd software configure-updater
 
       - name: Build and publish Tauri bundles
         uses: tauri-apps/tauri-action@v0
@@ -152,7 +152,7 @@ jobs:
           FAST_DRIVE_SKIP_FRONTEND_BUILD: "1"
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          projectPath: application
+          projectPath: software
           tauriScript: yarn tauri
           tagName: desktop-v__VERSION__
           releaseName: Fast Drive v__VERSION__

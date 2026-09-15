@@ -44,7 +44,7 @@ Thumbs.db
 .claude/settings.local.json
 .angular
 
-# local application data
+# local runtime data
 /data
 /backups
 /.env

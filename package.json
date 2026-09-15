@@ -4,7 +4,7 @@
     "private": true,
     "packageManager": "yarn@1.22.22",
     "workspaces": [
-        "application",
+        "software",
         "backend",
         "frontend",
         "package/*"
@@ -15,8 +15,8 @@
         "build": "yarn build:packages && yarn --cwd backend build && yarn --cwd frontend build",
         "dev:packages": "concurrently -k -n auth,file-models,shared-types \"yarn workspace @fast-drive/auth dev\" \"yarn workspace @fast-drive/file-models dev\" \"yarn workspace @fast-drive/shared-types dev\"",
         "dev": "yarn build:packages && concurrently -k -n packages,backend,frontend \"yarn dev:packages\" \"yarn --cwd backend start:dev\" \"yarn --cwd frontend start\"",
-        "desktop:dev": "yarn --cwd application dev",
-        "desktop:build": "yarn --cwd application build",
+        "desktop:dev": "yarn --cwd software dev",
+        "desktop:build": "yarn --cwd software build",
         "format": "biome format --write .",
         "format:check": "biome format .",
         "lint": "biome lint .",
