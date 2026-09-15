@@ -236,6 +236,7 @@
 
 .profile-remove-avatar:disabled,
 .profile-save:disabled,
+.profile-update:disabled,
 .profile-form input:disabled {
   cursor: wait;
   opacity: 0.55;
@@ -331,6 +332,24 @@
   font: inherit;
   font-size: 0.72rem;
   text-align: left;
+}
+
+.profile-update {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.65rem 0;
+  border: 0;
+  border-top: 1px solid #282828;
+  color: #888;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  text-align: left;
+}
+
+.profile-update:hover {
+  color: #eee;
 }
 
 .profile-server-config:hover {

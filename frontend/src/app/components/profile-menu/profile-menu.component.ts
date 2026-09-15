@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
+import { DesktopUpdateService } from '../../core/desktop-update.service';
 import { ModalService } from '../../core/modal.service';
 import { ServerConfigService } from '../../core/server-config.service';
 
@@ -24,6 +25,7 @@ export class ProfileMenuComponent {
     private readonly modal = inject(ModalService);
     private readonly router = inject(Router);
     private readonly changeDetectorRef = inject(ChangeDetectorRef);
+    private readonly desktopUpdate = inject(DesktopUpdateService);
     readonly serverConfig = inject(ServerConfigService);
 
     menuOpen = false;
@@ -35,6 +37,7 @@ export class ProfileMenuComponent {
     profileNotice = '';
     savingProfile = false;
     savingAvatar = false;
+    checkingUpdate = false;
 
     get currentUser() {
         return this.authService.user();
@@ -175,6 +178,40 @@ export class ProfileMenuComponent {
             await firstValueFrom(this.authService.logout());
         } finally {
             await this.router.navigateByUrl('/login');
+        }
+    }
+
+    async checkForUpdates(): Promise<void> {
+        if (!this.serverConfig.isDesktop || this.checkingUpdate) {
+            return;
+        }
+
+        this.checkingUpdate = true;
+        this.profileError = '';
+        this.profileNotice = 'Procurando atualizações...';
+        try {
+            const version = await this.desktopUpdate.checkForUpdates((progress) => {
+                if (progress.contentLength) {
+                    const percentage = Math.min(
+                        100,
+                        Math.round((progress.downloaded / progress.contentLength) * 100),
+                    );
+                    this.profileNotice = `Baixando atualização... ${percentage}%`;
+                } else {
+                    this.profileNotice = 'Baixando atualização...';
+                }
+                this.changeDetectorRef.markForCheck();
+            });
+
+            this.profileNotice = version
+                ? `Atualização ${version} instalada. Reiniciando...`
+                : 'Você já está usando a versão mais recente.';
+        } catch {
+            this.profileError = 'Não foi possível procurar atualizações. Verifique sua conexão.';
+            this.profileNotice = '';
+        } finally {
+            this.checkingUpdate = false;
+            this.changeDetectorRef.markForCheck();
         }
     }
 

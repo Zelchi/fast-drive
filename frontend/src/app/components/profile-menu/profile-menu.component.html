@@ -132,6 +132,14 @@
     </form>
 
     @if (serverConfig.isDesktop) {
+    <button
+      class="profile-update"
+      type="button"
+      [disabled]="checkingUpdate"
+      (click)="checkForUpdates()"
+    >
+      {{ checkingUpdate ? 'Procurando atualizações...' : 'Procurar atualizações' }}
+    </button>
     <button class="profile-server-config" type="button" (click)="changeServer()">
       Configurar servidor
     </button>
